@@ -1,0 +1,19 @@
+{
+  "roms": [
+    {
+      "name": "basic_rboot",
+      "version" : "1.0.0.0",
+      "file" :"basic_rboot_rom0.bin"
+    },
+    {
+      "name": "automaticOTA",
+      "version" : "1.0.0.0",
+      "file" :"automaticOTA_rom0.bin"
+    },
+    {
+      "name": "Sousvide",
+      "version" : "1.0.0.0",
+      "file" :"Sousvide_rom0.bin"
+    }
+  ]
+}

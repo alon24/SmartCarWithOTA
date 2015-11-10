@@ -1,0 +1,7 @@
+{
+  "rom":
+    {
+      "name": "automaticOTA",
+      "version" : "1.0.0.1"
+    }
+}
