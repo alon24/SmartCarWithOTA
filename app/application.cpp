@@ -1,5 +1,8 @@
 #include <user_config.h>
 #include <SmingCore/SmingCore.h>
+#include <SmingCore/Network/TelnetServer.h>
+#include <SmingCore/Debug.h>
+#include <CarCommand.h>
 
 // If you want, you can define WiFi settings globally in Eclipse Environment Variables
 #ifndef WIFI_SSID
@@ -12,6 +15,15 @@
 //#endif
 
 #define VERSION_CONFIG_FILE ".version" // leading point for security reasons :)
+
+HttpServer server;
+FTPServer ftp;
+TelnetServer telnet;
+
+Timer msgTimer;
+
+CarCommand carCommand;
+
 
 String projName = "";
 String thisBuildVersion = "";
@@ -38,54 +50,54 @@ void OtaUpdate_CallBack(bool result) {
 	}
 }
 
-void OtaUpdate() {
-	
-	uint8 slot;
-	rboot_config bootconf;
-
-	// need a clean object, otherwise if run before and failed will not run again
-	if (otaUpdater) delete otaUpdater;
-	otaUpdater = new rBootHttpUpdate();
-	
-	// select rom slot to flash
-	bootconf = rboot_get_config();
-	slot = bootconf.current_rom;
-	if (slot == 0) slot = 1; else slot = 0;
-
-	String romUrl = String(OTA_SERVER) + "/" + romFileName;
-	String spiffyUrl = String(OTA_SERVER) + "/" + spiffFileName;
-
-	debugf("Current rom slot is %d, OTA update romurl=%s, spiffUrl=%s", slot, romUrl.c_str(), spiffyUrl.c_str());
-
-#ifndef RBOOT_TWO_ROMS
-	// flash rom to position indicated in the rBoot config rom table
-	otaUpdater->addItem(bootconf.roms[slot], romUrl);
-#else
-	// flash appropriate rom
-	if (slot == 0) {
-		otaUpdater->addItem(bootconf.roms[slot], romUrl);
-	} else {
-		otaUpdater->addItem(bootconf.roms[slot], ROM_1_URL);
-	}
-#endif
-	
-#ifndef DISABLE_SPIFFS
-	// use user supplied values (defaults for 4mb flash in makefile)
-	if (slot == 0) {
-		otaUpdater->addItem(RBOOT_SPIFFS_0, spiffyUrl);
-	} else {
-		otaUpdater->addItem(RBOOT_SPIFFS_1, spiffyUrl);
-	}
-#endif
-
-	// request switch and reboot on success
-	//otaUpdater->switchToRom(slot);
-	// and/or set a callback (called on failure or success without switching requested)
-	otaUpdater->setCallback(OtaUpdate_CallBack);
-
-	// start update
-	otaUpdater->start();
-}
+//void OtaUpdate() {
+//
+//	uint8 slot;
+//	rboot_config bootconf;
+//
+//	// need a clean object, otherwise if run before and failed will not run again
+//	if (otaUpdater) delete otaUpdater;
+//	otaUpdater = new rBootHttpUpdate();
+//
+//	// select rom slot to flash
+//	bootconf = rboot_get_config();
+//	slot = bootconf.current_rom;
+//	if (slot == 0) slot = 1; else slot = 0;
+//
+//	String romUrl = String(OTA_SERVER) + "/" + romFileName;
+//	String spiffyUrl = String(OTA_SERVER) + "/" + spiffFileName;
+//
+//	debugf("Current rom slot is %d, OTA update romurl=%s, spiffUrl=%s", slot, romUrl.c_str(), spiffyUrl.c_str());
+//
+//#ifndef RBOOT_TWO_ROMS
+//	// flash rom to position indicated in the rBoot config rom table
+//	otaUpdater->addItem(bootconf.roms[slot], romUrl);
+//#else
+//	// flash appropriate rom
+//	if (slot == 0) {
+//		otaUpdater->addItem(bootconf.roms[slot], romUrl);
+//	} else {
+//		otaUpdater->addItem(bootconf.roms[slot], ROM_1_URL);
+//	}
+//#endif
+//
+//#ifndef DISABLE_SPIFFS
+//	// use user supplied values (defaults for 4mb flash in makefile)
+//	if (slot == 0) {
+//		otaUpdater->addItem(RBOOT_SPIFFS_0, spiffyUrl);
+//	} else {
+//		otaUpdater->addItem(RBOOT_SPIFFS_1, spiffyUrl);
+//	}
+//#endif
+//
+//	// request switch and reboot on success
+//	//otaUpdater->switchToRom(slot);
+//	// and/or set a callback (called on failure or success without switching requested)
+//	otaUpdater->setCallback(OtaUpdate_CallBack);
+//
+//	// start update
+//	otaUpdater->start();
+//}
 
 void Switch() {
 	uint8 before, after;
@@ -104,7 +116,7 @@ void ShowInfo() {
     Serial.printf("System Chip ID: %x\r\n", system_get_chip_id());
     Serial.printf("SPI Flash ID: %x\r\n", spi_flash_get_id());
     Serial.printf("Current Rom is: %d\r\n", rboot_get_current_rom());
-    Serial.printf("OTA Server URL: %s", OTA_SERVER);
+//    Serial.printf("OTA Server URL: %s", OTA_SERVER);
     //Serial.printf("SPI Flash Size: %d\r\n", (1 << ((spi_flash_get_id() >> 16) & 0xff)));
 }
 
@@ -193,8 +205,8 @@ bool checkNeedsOTAUpdate() {
 	projName = String((const char*)rom["name"]);
 	thisBuildVersion = String((const char*)rom["version"]);
 	debugf("Current proj is %s, current version is %s", projName.c_str(), thisBuildVersion.c_str());
-	String ota = String(OTA_SERVER) + "/versions.txt";
-	testOTA.downloadString( ota, onDataSent);
+//	String ota = String(OTA_SERVER) + "/versions.txt";
+//	testOTA.downloadString( ota, onDataSent);
 }
 
 void serialCallBack(Stream& stream, char arrivedChar, unsigned short availableCharsCount) {
@@ -214,7 +226,7 @@ void serialCallBack(Stream& stream, char arrivedChar, unsigned short availableCh
 		} else if (!strcmp(str, "ip")) {
 			Serial.printf("ip: %s mac: %s\r\n", WifiStation.getIP().toString().c_str(), WifiStation.getMAC().c_str());
 		} else if (!strcmp(str, "ota")) {
-			OtaUpdate();
+//			OtaUpdate();
 		} else if (!strcmp(str, "switch")) {
 			Switch();
 		} else if (!strcmp(str, "restart")) {
@@ -261,8 +273,102 @@ void serialCallBack(Stream& stream, char arrivedChar, unsigned short availableCh
 	}
 }
 
+void onIndex(HttpRequest &request, HttpResponse &response)
+{
+	TemplateFileStream *tmpl = new TemplateFileStream("index.html");
+	auto &vars = tmpl->variables();
+	//vars["counter"] = String(counter);
+	response.sendTemplate(tmpl); // this template object will be deleted automatically
+}
+
+void onFile(HttpRequest &request, HttpResponse &response)
+{
+	String file = request.getPath();
+	if (file[0] == '/')
+		file = file.substring(1);
+
+	if (file[0] == '.')
+		response.forbidden();
+	else
+	{
+		response.setCache(86400, true); // It's important to use cache for better performance.
+		response.sendFile(file);
+	}
+}
+
+int msgCount = 0;
+
+void wsConnected(WebSocket& socket)
+{
+	Serial.printf("Socket connected\r\n");
+}
+
+void wsMessageReceived(WebSocket& socket, const String& message)
+{
+	Serial.printf("WebSocket message received:\r\n%s\r\n", message.c_str());
+	String response = "Echo: " + message;
+	socket.sendString(response);
+}
+
+void wsBinaryReceived(WebSocket& socket, uint8_t* data, size_t size)
+{
+	Serial.printf("Websocket binary data recieved, size: %d\r\n", size);
+}
+
+void wsDisconnected(WebSocket& socket)
+{
+	Serial.printf("Socket disconnected");
+}
+
+void processApplicationCommands(String commandLine, CommandOutput* commandOutput)
+{
+	commandOutput->printf("This command is handle by the application\r\n");
+}
+
+void StartServers()
+{
+	server.listen(80);
+	server.addPath("/", onIndex);
+	server.setDefaultHandler(onFile);
+
+	// Web Sockets configuration
+	server.enableWebSockets(true);
+	server.commandProcessing(true,"command");
+
+	server.setWebSocketConnectionHandler(wsConnected);
+	server.setWebSocketMessageHandler(wsMessageReceived);
+	server.setWebSocketBinaryHandler(wsBinaryReceived);
+	server.setWebSocketDisconnectionHandler(wsDisconnected);
+
+	Serial.println("\r\n=== WEB SERVER STARTED ===");
+	Serial.println(WifiStation.getIP());
+	Serial.println("==============================\r\n");
+
+	// Start FTP server
+	ftp.listen(21);
+	ftp.addUser("me", "123"); // FTP account
+
+	Serial.println("\r\n=== FTP SERVER STARTED ===");
+	Serial.println("==============================\r\n");
+
+	telnet.listen(23);
+	telnet.enableDebug(true);
+
+	Serial.println("\r\n=== TelnetServer SERVER STARTED ===");
+	Serial.println("==============================\r\n");
+}
+
+void initCarCommands()
+{
+	carCommand.initCommand();
+	commandHandler.registerCommand(CommandDelegate("example","Example Command from Class","Application",processApplicationCommands));
+}
+
 void connectOk() {
 	checkNeedsOTAUpdate();
+
+	StartServers();
+	initCarCommands();
 }
 
 void connectFail() {

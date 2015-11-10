@@ -1,0 +1,63 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Toms Smart Car</title>
+<!-- Local code -->
+<script type="text/javascript" src="main.js"></script>
+<link href="main.css" rel="stylesheet" type="text/css">
+
+</head>
+<body>
+
+	<h1 align="center">מכונית חכמה</h2>
+	<h2 align="center">שייך לתום ושלי</h2>
+	<button onclick="connectBtn()">Connect WS</button>
+	<button onclick="disConnectBtn()">Disconnect</button>
+	<br>
+	<br>
+	
+	<form>
+	  Network SSID<br>
+	  <input type="text" name="ssid">
+	  <br>
+	  Password:<br>
+	  <input type="text" name="password">
+	  <br>
+	  OTA Server:<br>
+	  <input type="text" name="otaServer">
+	</form>
+	
+	<button onclick="saveConfig()">Save Config</button>
+
+<!-- 	<input id="sendMessage" size="35" value="help"> -->
+<!-- 	<button onclick="sendMessageBtn()">Send Message</button> -->
+
+<h1 align="center">שליטה במכונית</h1>
+	<table>
+		<tbody>
+			<tr>
+				<td> <button onclick="doSend("Move lFast")">שמאלה מהר</button> </td>
+				<td> <button onclick="doSend("Move up")">מעלה</button> </td>
+				<td> <button onclick="doSend("Move rFast")">ימינה מהר</button> </td>
+			 </tr>
+			<tr>
+				<td> <button onclick="doSend("Move left")">שמאלה</button> </td>
+				<td> <button onclick="doSend("Move stop")">עצור</button> </td>
+				<td> <button onclick="doSend("Move right")">ימינה</button> </td>
+			 </tr>
+			 <tr>
+				<td> <button onclick="doSend("Move no")">לא?</button> </td>
+				<td> <button onclick="doSend("Move down")">למטה</button> </td>
+				<td> <button onclick="doSend("Move yes")">כן??</button> </td>
+			 </tr>
+		</tbody>
+	</table>
+	
+
+	<br>
+	<br>
+
+</body>
+</html>
