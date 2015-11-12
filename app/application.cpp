@@ -16,13 +16,22 @@
 
 #define VERSION_CONFIG_FILE ".version" // leading point for security reasons :)
 
+//http://www.smartarduino.com/2wd-wifi-rc-smart-car-with-nodemcu-shield-for-esp-12e_p94572.html
+//https://smartarduino.gitbooks.io/user-manual-for-wifi-car-by-nodemcu-doitcar-/content/31_code_for_ap_case_on_doitcar.html
+//--GPIO Define
+//2     function initGPIO()
+//3     --1,2EN     D1 GPIO5
+//4     --3,4EN     D2 GPIO4
+//5     --1A  ~2A   D3 GPIO0
+//6     --3A  ~4A   D4 GPIO2
+
 HttpServer server;
-FTPServer ftp;
+//FTPServer ftp;
 TelnetServer telnet;
 
 Timer msgTimer;
 
-CarCommand carCommand;
+CarCommand carCommand(5, 4,  0, 2);
 
 
 String projName = "";
@@ -344,12 +353,12 @@ void StartServers()
 	Serial.println(WifiStation.getIP());
 	Serial.println("==============================\r\n");
 
-	// Start FTP server
-	ftp.listen(21);
-	ftp.addUser("me", "123"); // FTP account
-
-	Serial.println("\r\n=== FTP SERVER STARTED ===");
-	Serial.println("==============================\r\n");
+//	// Start FTP server
+//	ftp.listen(21);
+//	ftp.addUser("me", "123"); // FTP account
+//
+//	Serial.println("\r\n=== FTP SERVER STARTED ===");
+//	Serial.println("==============================\r\n");
 
 	telnet.listen(23);
 	telnet.enableDebug(true);
@@ -408,6 +417,9 @@ void init() {
 	WifiStation.enable(true);
 	WifiStation.config(WIFI_SSID, WIFI_PWD);
 	WifiStation.waitConnection(connectOk, 20, connectFail);
+
+	WifiAccessPoint.enable(true);
+	WifiAccessPoint.config("SmartCar", "", AUTH_OPEN);
 
 	Serial.printf("\r\nCurrently running rom %d.\r\n", slot);
 	Serial.println("Type 'help' and press enter for instructions.");

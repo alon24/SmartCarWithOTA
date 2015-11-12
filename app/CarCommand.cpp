@@ -5,8 +5,20 @@
 
 #include <CarCommand.h>
 
-CarCommand::CarCommand()
+CarCommand::CarCommand(int pwmA, int pwmB, int dirA, int dirB)
 {
+	this->pwmA = pwmA;
+	this->pwmB = pwmB;
+	this->dirA = dirA;
+	this->dirB = dirB;
+
+	pinMode(pwmA, OUTPUT);
+	pinMode(pwmB, OUTPUT);
+	pinMode(dirA, OUTPUT);
+	digitalWrite(dirA, LOW);
+	pinMode(dirB, OUTPUT);
+	digitalWrite(dirB, LOW);
+
 	debugf("CarCommand Instantiating");
 }
 
@@ -26,27 +38,38 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 
 	if (numToken == 1)
 	{
-		commandOutput->printf("Example Commands available : \r\n");
-		commandOutput->printf("on   : Set example status ON\r\n");
-		commandOutput->printf("off  : Set example status OFF\r\n");
-		commandOutput->printf("status : Show example status\r\n");
+		commandOutput->printf("Move Commands available : \r\n");
+		commandOutput->printf("faster   : Set example status ON\r\n");
+		commandOutput->printf("slower  : Set example status OFF\r\n");
+		commandOutput->printf("up : Show example status\r\n");
+		commandOutput->printf("down : Show example status\r\n");
+		commandOutput->printf("left : Show example status\r\n");
+		commandOutput->printf("right : Show example status\r\n");
+		commandOutput->printf("stop : Show example status\r\n");
 	}
 	else
 	{
-		if (commandToken[1] == "on")
+		if (commandToken[1] == "faster")
 		{
-			status = true;
-			commandOutput->printf("Status ON\r\n");
+			commandOutput->printf("faster\r\n");
 		}
-		else if (commandToken[1] == "off")
-		{
-			status = false;
-			commandOutput->printf("Status OFF\r\n");
+		else if (commandToken[1] == "slower") {
+			commandOutput->printf("slower\r\n");
 		}
-		else if (commandToken[1] == "status")
-		{
-			String tempString = status ? "ON" : "OFF";
-			commandOutput->printf("Example Status is %s\r\n",tempString.c_str());
+		else if (commandToken[1] == "up") {
+			commandOutput->printf("up\r\n");
+		}
+		else if (commandToken[1] == "down") {
+			commandOutput->printf("down\r\n");
+		}
+		else if (commandToken[1] == "left") {
+			commandOutput->printf("lwft\r\n");
+		}
+		else if (commandToken[1] == "right") {
+			commandOutput->printf("right\r\n");
+		}
+		else if (commandToken[1] == "stop") {
+			commandOutput->printf("stop\r\n");
 		};
 
 	}
