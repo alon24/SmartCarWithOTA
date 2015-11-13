@@ -12,6 +12,8 @@
 
 //https://www.gitbook.com/book/smartarduino/user-mannual-for-esp-12e-motor-shield/details
 
+typedef Delegate<void()> carMotorDelegate;
+
 class CarCommand
 {
 public:
@@ -39,7 +41,15 @@ private:
 
 	bool stopFlag =true;
 
+	DriverPWM motoAPWM;
+	DriverPWM motoBPWM;
+	Timer motorTimer;
+
 	void processCarCommands(String commandLine, CommandOutput* commandOutput);
+	void doAPWM();
+	void doBPWM();
+
+	void handleMotorTimer();
 };
 
 

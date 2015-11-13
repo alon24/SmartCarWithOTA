@@ -12,12 +12,17 @@ CarCommand::CarCommand(int pwmA, int pwmB, int dirA, int dirB)
 	this->dirA = dirA;
 	this->dirB = dirB;
 
-	pinMode(pwmA, OUTPUT);
-	pinMode(pwmB, OUTPUT);
+//	pinMode(pwmA, OUTPUT);
+//	pinMode(pwmB, OUTPUT);
+
 	pinMode(dirA, OUTPUT);
 	digitalWrite(dirA, LOW);
 	pinMode(dirB, OUTPUT);
 	digitalWrite(dirB, LOW);
+
+	motoAPWM.initialize();
+	motoBPWM.initialize();
+	motorTimer.setCallback(carMotorDelegate(&CarCommand::handleMotorTimer, this));
 
 	debugf("CarCommand Instantiating");
 }
@@ -74,5 +79,39 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 
 	}
 }
+
+void CarCommand::handleMotorTimer() {
+
+};
+
+
+//
+//int i = 0;
+//bool countUp = true;
+//bool countDown = false;
+
+void CarCommand::doAPWM()
+{
+//	if(countUp){
+//		i++;
+//		if(i == 100){
+//			countUp = false;
+//			countDown = true;
+//		}
+//	}
+//	else{
+//		i--;
+//		if(i == 0){
+//			countUp = true;
+//			countDown = false;
+//		}
+//	}
+//	Serial.println(i);
+//	ledPWM.analogWrite(LED_PIN, i);
+}
+
+void CarCommand::doBPWM() {
+
+};
 
 
