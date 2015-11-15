@@ -68,8 +68,8 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 
 		commandOutput->printf("ffLeft : Show example status\r\n");
 		commandOutput->printf("ffRight : Show example status\r\n");
-		commandOutput->printf("backRight : Show example status\r\n");
 		commandOutput->printf("backLeft : Show example status\r\n");
+		commandOutput->printf("backRight : Show example status\r\n");
 
 		commandOutput->printf("stop : Show example status\r\n");
 	}
