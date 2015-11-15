@@ -14,18 +14,31 @@
 
 typedef Delegate<void()> carMotorDelegate;
 
+enum CarDirection {
+	FORWARD,
+	BACK,
+	LEFT,
+	RIGHT,
+	FF_LEFT,
+	FF_RIGHT,
+	BA_LEFT,
+	BA_RIGHT
+};
+
 class CarCommand
 {
 public:
-	CarCommand(int pwmA, int pwmB, int dirA, int dirB);
+	CarCommand(int leftMotorPWM, int rightMotorPWM, int leftMotorDir, int rightMotorDir);
 	virtual ~CarCommand();
 	void initCommand();
 
 private:
-	int pwmA;
-	int pwmB;
-	int dirA;
-	int dirB;
+	CarDirection direction = FORWARD;
+	int leftMotorPWM;
+	int rightMotorPWM;
+	int leftMotorDir;
+	int rightMotorDir;
+	bool stopped = false;
 
 	//--target Speed
 	int spdTargetA=1023;
@@ -38,18 +51,13 @@ private:
 
 	//--current speed
 	int spdCurrentB = 0;
-
 	bool stopFlag =true;
-
-	DriverPWM motoAPWM;
-	DriverPWM motoBPWM;
+	long lastActionTime;
 	Timer motorTimer;
 
 	void processCarCommands(String commandLine, CommandOutput* commandOutput);
-	void doAPWM();
-	void doBPWM();
-
 	void handleMotorTimer();
+	void enableMovement(bool state);
 };
 
 

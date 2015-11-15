@@ -373,7 +373,7 @@ void initCarCommands()
 }
 
 void connectOk() {
-	checkNeedsOTAUpdate();
+//	checkNeedsOTAUpdate();
 
 	StartServers();
 	initCarCommands();
