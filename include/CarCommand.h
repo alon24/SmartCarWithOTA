@@ -14,7 +14,12 @@
 
 typedef Delegate<void()> carMotorDelegate;
 
+//enum CarVector {
+//	FORWARD,
+//	BACK
+//};
 enum CarDirection {
+	STOP,
 	FORWARD,
 	BACK,
 	LEFT,
@@ -39,6 +44,7 @@ private:
 	int leftMotorDir;
 	int rightMotorDir;
 	bool stopped = false;
+	int duration = 200;
 
 	//--target Speed
 	int spdTargetA=1023;

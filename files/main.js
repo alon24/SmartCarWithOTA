@@ -77,3 +77,17 @@ function saveConfig() {
 	doSend("ASd");
 }
 
+var intervalId; // keep the ret val from setTimeout()
+function mousedownfunc(cmd) {
+	
+    intervalId = setInterval(runme, 200, cmd);
+}
+
+function mouseupfunc() {
+    clearInterval(intervalId);
+}
+
+function runme(cmd) {
+	doSend('Move ' + cmd);
+}
+
