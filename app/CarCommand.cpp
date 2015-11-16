@@ -96,65 +96,30 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 
 			direction = STRAIGHT;
 			vector = FORWARD;
+			stopped = false;
 			lastActionTime = millis();
 		}
 		else if (commandToken[1] == "back") {
 			commandOutput->printf("back\r\n");
-
-////			digitalWrite(pwmA, LOW);
-////			digitalWrite(pwmB, LOW);
-//
-//			digitalWrite(leftMotorDir, HIGH);
-//			digitalWrite(rightMotorDir, HIGH);
-//
-////			digitalWrite(pwmA, HIGH);
-////			digitalWrite(pwmB, HIGH);
-//			enableMovement(true);
 			direction = STRAIGHT;
 			vector = BACK;
+			stopped = false;
 			lastActionTime = millis();
 		}
 		else if (commandToken[1] == "left") {
-			commandOutput->printf("lwft\r\n");
-//
-//			digitalWrite(leftMotorPWM, LOW);
-////			digitalWrite(pwmB, LOW);
-//
-//			digitalWrite(rightMotorDir, LOW);
-////			digitalWrite(dirA, HIGH);
-//
-////			digitalWrite(pwmA, HIGH);
-//			digitalWrite(rightMotorPWM, HIGH);
-////			enableMovement(true);
+			commandOutput->printf("left\r\n");
 			direction = LEFT;
 			lastActionTime = millis();
 		}
 		else if (commandToken[1] == "right") {
 			commandOutput->printf("right\r\n");
-////			digitalWrite(pwmA, LOW);
-//			digitalWrite(rightMotorPWM, LOW);
-//
-////			digitalWrite(dirB, HIGH);
-//			digitalWrite(leftMotorDir, LOW);
-//
-//			digitalWrite(leftMotorPWM, HIGH);
-////			digitalWrite(pwmB, HIGH);
-////			enableMovement(true);
 			direction = RIGHT;
 			lastActionTime = millis();
 		}
 		else if (commandToken[1] == "ffLeft") {
 			commandOutput->printf("ffLeft\r\n");
-////			digitalWrite(pwmA, LOW);
-//			digitalWrite(rightMotorPWM, LOW);
-//
-////			digitalWrite(dirB, HIGH);
-//			digitalWrite(leftMotorDir, LOW);
-//
-//			digitalWrite(leftMotorPWM, HIGH);
-////			digitalWrite(pwmB, HIGH);
-////			enableMovement(true);
-//			lastActionTime = millis();
+			direction = LEFT;
+			lastActionTime = millis();
 		} else if (commandToken[1] == "ffRight") {
 			commandOutput->printf("ffRight\r\n");
 //			//			digitalWrite(pwmA, LOW);
@@ -194,61 +159,68 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 		}
 		else if (commandToken[1] == "stop") {
 			commandOutput->printf("stop\r\n");
-			vector = STOP;
 //			digitalWrite(leftMotorPWM, LOW);
 //			digitalWrite(rightMotorPWM, LOW);
-//			stopped = true;
+			stopped = true;
 		};
 
 	}
 }
 
-void CarCommand::enableMovement(bool state) {
-	if(state) {
-		digitalWrite(leftMotorPWM, HIGH);
-		digitalWrite(rightMotorPWM, HIGH);
-		stopped = false;
-	} else {
-		digitalWrite(leftMotorPWM, LOW);
-		digitalWrite(rightMotorPWM, LOW);
-		stopped = true;
-	}
-}
+//void CarCommand::enableMovement(bool state) {
+//	if(state) {
+//		digitalWrite(leftMotorPWM, HIGH);
+//		digitalWrite(rightMotorPWM, HIGH);
+//		stopped = false;
+//	} else {
+//		digitalWrite(leftMotorPWM, LOW);
+//		digitalWrite(rightMotorPWM, LOW);
+//		stopped = true;
+//	}
+//}
 
 void CarCommand::handleMotorTimer() {
 	long currentTime = millis();
 //	debugf("current =%d, last=%d", currentTime, lastActionTime);
+
+	if (stopped) {
+		digitalWrite(leftMotorPWM, LOW);
+		digitalWrite(rightMotorPWM, LOW);
+		return;
+	}
+
+	if(direction == STRAIGHT)
+	{
+		digitalWrite(leftMotorPWM, HIGH);
+		digitalWrite(rightMotorPWM, HIGH);
+		if (vector == FORWARD) {
+			digitalWrite(leftMotorDir, FF);
+			digitalWrite(rightMotorDir, FF);
+		} else if(vector == BACK) {
+			digitalWrite(leftMotorDir, REV);
+			digitalWrite(rightMotorDir, REV);
+		}
+	} else if(direction == LEFT) {
+		digitalWrite(leftMotorPWM, LOW);
+		digitalWrite(rightMotorPWM, HIGH);
+		if (vector == FORWARD) {
+			digitalWrite(rightMotorDir, FF);
+		} else if(vector == BACK) {
+			digitalWrite(rightMotorDir, REV);
+		}
+	} else if(direction == RIGHT) {
+		digitalWrite(leftMotorPWM, HIGH);
+		digitalWrite(rightMotorPWM, LOW);
+		if (vector == FORWARD) {
+			digitalWrite(leftMotorDir, FF);
+		} else if(vector == BACK) {
+			digitalWrite(leftMotorDir, REV);
+		}
+	}
+
 //	if(currentTime - (lastActionTime + duration) >= 0) {
 //		digitalWrite(leftMotorPWM, LOW);
 //		digitalWrite(rightMotorPWM, LOW);
 //		return;
-//	}
-////
-////	debugf("after mills check ");
-//	if(direction == FORWARD) {
-//		debugf("Moving FF ");
-//		digitalWrite(leftMotorDir, LOW);
-//		digitalWrite(rightMotorDir, LOW);
-//
-//		digitalWrite(leftMotorPWM, HIGH);
-//		digitalWrite(rightMotorPWM, HIGH);
-//	}
-//	else if(direction == BACK) {
-//		debugf("Moving BK ");
-//		digitalWrite(leftMotorDir, HIGH);
-//		digitalWrite(rightMotorDir, HIGH);
-//
-//		digitalWrite(leftMotorPWM, HIGH);
-//		digitalWrite(rightMotorPWM, HIGH);
-//	}
-//	else if(direction == LEFT) {
-//		digitalWrite(leftMotorPWM, LOW);
-//		digitalWrite(rightMotorDir, LOW);
-//		digitalWrite(rightMotorPWM, HIGH);
-//	}
-//	else if(direction == RIGHT) {
-//		digitalWrite(rightMotorPWM, LOW);
-//		digitalWrite(leftMotorDir, LOW);
-//		digitalWrite(leftMotorPWM, HIGH);
 //	}
 };

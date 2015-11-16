@@ -11,6 +11,8 @@
 #include "../Services/CommandProcessing/CommandProcessingIncludes.h"
 
 //https://www.gitbook.com/book/smartarduino/user-mannual-for-esp-12e-motor-shield/details
+#define FF 0
+#define REV 1
 
 typedef Delegate<void()> carMotorDelegate;
 
@@ -20,7 +22,6 @@ enum CarDirection {
 	RIGHT
 };
 enum CarVector {
-	STOP,
 	FORWARD,
 	BACK
 };
@@ -33,7 +34,8 @@ public:
 	void initCommand();
 
 private:
-	CarVector vector = STOP;
+	bool stopped = true;
+	CarVector vector = FORWARD;
 	CarDirection direction = STRAIGHT;
 
 	int currentCmd = 0;
