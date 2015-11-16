@@ -14,20 +14,15 @@
 
 typedef Delegate<void()> carMotorDelegate;
 
-//enum CarVector {
-//	FORWARD,
-//	BACK
-//};
 enum CarDirection {
+	STRAIGHT,
+	LEFT,
+	RIGHT
+};
+enum CarVector {
 	STOP,
 	FORWARD,
-	BACK,
-	LEFT,
-	RIGHT,
-	FF_LEFT,
-	FF_RIGHT,
-	BA_LEFT,
-	BA_RIGHT
+	BACK
 };
 
 class CarCommand
@@ -38,12 +33,15 @@ public:
 	void initCommand();
 
 private:
-	CarDirection direction = FORWARD;
+	CarVector vector = STOP;
+	CarDirection direction = STRAIGHT;
+
+	int currentCmd = 0;
+
 	int leftMotorPWM;
 	int rightMotorPWM;
 	int leftMotorDir;
 	int rightMotorDir;
-	bool stopped = false;
 	int duration = 200;
 
 	//--target Speed

@@ -32,13 +32,13 @@ Timer msgTimer;
 
 CarCommand carCommand(5, 4,  0, 2);
 
-
 String projName = "";
 String thisBuildVersion = "";
 String romFileName = "";
 String spiffFileName = "";
 
 rBootHttpUpdate* otaUpdater = 0;
+Timer keepAliveTimer;
 
 void OtaUpdate_CallBack(bool result) {
 	
@@ -333,8 +333,15 @@ void processApplicationCommands(String commandLine, CommandOutput* commandOutput
 	commandOutput->printf("This command is handle by the application\r\n");
 }
 
+void initCarCommands()
+{
+	carCommand.initCommand();
+	commandHandler.registerCommand(CommandDelegate("example","Example Command from Class","Application",processApplicationCommands));
+}
+
 void StartServers()
 {
+	debugf("Starting Server");
 	server.listen(80);
 	server.addPath("/", onIndex);
 	server.setDefaultHandler(onFile);
@@ -350,6 +357,8 @@ void StartServers()
 
 	Serial.println("\r\n=== WEB SERVER STARTED ===");
 	Serial.println(WifiStation.getIP());
+	Serial.println(WifiAccessPoint.getIP());
+
 	Serial.println("==============================\r\n");
 
 //	// Start FTP server
@@ -359,28 +368,37 @@ void StartServers()
 //	Serial.println("\r\n=== FTP SERVER STARTED ===");
 //	Serial.println("==============================\r\n");
 
-	telnet.listen(23);
-	telnet.enableDebug(true);
+//	telnet.listen(23);
+//	telnet.enableDebug(true);
 
 	Serial.println("\r\n=== TelnetServer SERVER STARTED ===");
 	Serial.println("==============================\r\n");
-}
 
-void initCarCommands()
-{
-	carCommand.initCommand();
-	commandHandler.registerCommand(CommandDelegate("example","Example Command from Class","Application",processApplicationCommands));
+	initCarCommands();
 }
 
 void connectOk() {
+	debugf("Connected to STA ip=%s", WifiStation.getIP().toString().c_str());
 //	checkNeedsOTAUpdate();
 
-	StartServers();
-	initCarCommands();
+//	StartServers();
 }
 
 void connectFail() {
 	Serial.println("Not Connectd to Station !!!");
+}
+
+Timer onetime;
+
+void updateWebSockets(String cmd) {
+	WebSocketsList &clients = server.getActiveWebSockets();
+	for (int i = 0; i < clients.count(); i++) {
+		clients[i].sendString(cmd);
+	}
+}
+
+void updateTime() {
+	updateWebSockets("heart");
 }
 
 void init() {
@@ -411,7 +429,6 @@ void init() {
 #else
 	debugf("spiffs disabled");
 #endif
-	WifiAccessPoint.enable(false);
 	
 	WifiStation.enable(true);
 	WifiStation.config(WIFI_SSID, WIFI_PWD);
@@ -424,5 +441,16 @@ void init() {
 	Serial.println("Type 'help' and press enter for instructions.");
 	Serial.println();
 	
+	commandHandler.registerSystemCommands();
+	Debug.setDebug(Serial);
+	Serial.systemDebugOutput(true); // Enable debug output to serial
+//	Serial.commandProcessing(true);
 	Serial.setCallback(serialCallBack);
+
+//	onetime.initializeMs(10000, StartServers).startOnce();
+	//Change CPU freq. to 160MHZ
+	System.setCpuFrequency(eCF_160MHz);
+
+	// Run WEB server on system ready
+	System.onReady(StartServers);
 }
