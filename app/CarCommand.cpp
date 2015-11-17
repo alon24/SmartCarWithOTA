@@ -183,6 +183,12 @@ void CarCommand::handleMotorTimer() {
 	long currentTime = millis();
 //	debugf("current =%d, last=%d", currentTime, lastActionTime);
 
+	if(currentTime - (lastActionTime + duration) >= 0) {
+		digitalWrite(leftMotorPWM, LOW);
+		digitalWrite(rightMotorPWM, LOW);
+		return;
+	}
+
 	if (stopped) {
 		digitalWrite(leftMotorPWM, LOW);
 		digitalWrite(rightMotorPWM, LOW);
@@ -217,10 +223,4 @@ void CarCommand::handleMotorTimer() {
 			digitalWrite(leftMotorDir, REV);
 		}
 	}
-
-//	if(currentTime - (lastActionTime + duration) >= 0) {
-//		digitalWrite(leftMotorPWM, LOW);
-//		digitalWrite(rightMotorPWM, LOW);
-//		return;
-//	}
 };

@@ -21,13 +21,13 @@ MODULES = app
 
 ## COM port parameter is reqruied to flash firmware correctly.
 ## Windows: 
-COM_PORT = COM5
+#COM_PORT = COM5
 
 
-#COM_PORT = /dev/tty.SLAB_USBtoUART
+COM_PORT = /dev/tty.SLAB_USBtoUART
 
 # MacOS / Linux:
-# COM_PORT = /dev/tty.usbserial
+#COM_PORT = /dev/tty.usbserial
 
 # Com port speed
  COM_SPEED	= 961000

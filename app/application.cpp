@@ -430,12 +430,13 @@ void init() {
 	debugf("spiffs disabled");
 #endif
 	
-	WifiStation.enable(true);
-	WifiStation.config(WIFI_SSID, WIFI_PWD);
-	WifiStation.waitConnection(connectOk, 20, connectFail);
+	WifiStation.enable(false);
+//	WifiStation.enable(true);
+//	WifiStation.config(WIFI_SSID, WIFI_PWD);
+//	WifiStation.waitConnection(connectOk, 20, connectFail);
 
 	WifiAccessPoint.enable(true);
-	WifiAccessPoint.config("SmartCar", "", AUTH_OPEN);
+	WifiAccessPoint.config("SmartCar", "", AUTH_OPEN, false, 11, 200);
 
 	Serial.printf("\r\nCurrently running rom %d.\r\n", slot);
 	Serial.println("Type 'help' and press enter for instructions.");

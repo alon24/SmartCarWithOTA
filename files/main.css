@@ -1,5 +1,21 @@
 table
-{ 
+{
     margin-left: auto;
     margin-right: auto;
+}
+
+.btn {
+ color: #FF0000;
+ font-size: 40px;
+ width: 135px;
+ height: 60px;
+ border: none;
+ margin: 0;
+ padding: 0;
+ background: #FFFF00 url(image) 0 0 no-repeat;
+}
+
+.stop{
+  color: #FFFF00;
+  background: #FF0000;
 }
