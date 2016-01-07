@@ -11,7 +11,6 @@
  * pwmA = leftMotorPWM
  * pwmB = rightMotorPWM
  */
-
 CarCommand::CarCommand(int leftMotorPWM, int rightMotorPWM, int leftMotorDir, int rightMotorDir)
 {
 	this->leftMotorPWM = leftMotorPWM;
@@ -29,24 +28,20 @@ void CarCommand::initCommand()
 {
 	commandHandler.registerCommand(CommandDelegate("Move","Example Command from Class","Application",commandFunctionDelegate(&CarCommand::processCarCommands,this)));
 
-	//	pinMode(pwmA, OUTPUT);
-	//	pinMode(pwmB, OUTPUT);
+	pinMode(leftMotorDir, OUTPUT);
+	digitalWrite(leftMotorDir, HIGH);
+	pinMode(rightMotorDir, OUTPUT);
+	digitalWrite(rightMotorDir, HIGH);
 
-		pinMode(leftMotorDir, OUTPUT);
-		digitalWrite(leftMotorDir, HIGH);
-		pinMode(rightMotorDir, OUTPUT);
-		digitalWrite(rightMotorDir, HIGH);
+	pinMode(leftMotorPWM, OUTPUT);
+	pinMode(rightMotorPWM, OUTPUT);
+	digitalWrite(leftMotorPWM, LOW);
+	digitalWrite(rightMotorPWM, LOW);
 
-		pinMode(leftMotorPWM, OUTPUT);
-		pinMode(rightMotorPWM, OUTPUT);
-		digitalWrite(leftMotorPWM, LOW);
-		digitalWrite(rightMotorPWM, LOW);
-
-	//	motoAPWM.initialize();
-	//	motoBPWM.initialize();
-		motorTimer.setCallback(carMotorDelegate(&CarCommand::handleMotorTimer, this));
-		motorTimer.setIntervalMs(200);
-		motorTimer.start(true);
+	//Check and act upon car commands
+	motorTimer.setCallback(carMotorDelegate(&CarCommand::handleMotorTimer, this));
+	motorTimer.setIntervalMs(50);
+	motorTimer.start(true);
 }
 
 void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOutput)
@@ -65,12 +60,13 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 		commandOutput->printf("left : Show example status\r\n");
 		commandOutput->printf("right : Show example status\r\n");
 
-		commandOutput->printf("ffLeft : Show example status\r\n");
-		commandOutput->printf("ffRight : Show example status\r\n");
-		commandOutput->printf("backLeft : Show example status\r\n");
-		commandOutput->printf("backRight : Show example status\r\n");
+		commandOutput->printf("ffLeft : Move faster ff left\r\n");
+		commandOutput->printf("ffRight : Move faster ff right\r\n");
+		commandOutput->printf("backLeft : Move faster bk left\r\n");
+		commandOutput->printf("backRight : Move faster bk lefts\r\n");
 
 		commandOutput->printf("stop : Show example status\r\n");
+		commandOutput->printf("xyp : Send X axis, Y axis, POWER\r\n");
 	}
 	else
 	{
@@ -94,75 +90,87 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 ////			digitalWrite(pwmA, HIGH);
 ////			digitalWrite(pwmB, HIGH);
 
-			direction = STRAIGHT;
-			vector = FORWARD;
-			stopped = false;
+			dir = FW;
+			tdir = STRAIGHT;
+//			stopped = false;
 			lastActionTime = millis();
 		}
 		else if (commandToken[1] == "back") {
 			commandOutput->printf("back\r\n");
-			direction = STRAIGHT;
-			vector = BACK;
-			stopped = false;
+			dir = BK;
+			tdir = STRAIGHT;
+//			stopped = false;
 			lastActionTime = millis();
 		}
 		else if (commandToken[1] == "left") {
 			commandOutput->printf("left\r\n");
-			direction = LEFT;
+			dir = FW;
+			tdir = TL;
+			tcount = 0;
 			lastActionTime = millis();
 		}
 		else if (commandToken[1] == "right") {
 			commandOutput->printf("right\r\n");
-			direction = RIGHT;
+			dir = FW;
+			tdir =TR;
+			tcount = 0;
 			lastActionTime = millis();
 		}
-		else if (commandToken[1] == "ffLeft") {
-			commandOutput->printf("ffLeft\r\n");
-			direction = LEFT;
-			lastActionTime = millis();
-		} else if (commandToken[1] == "ffRight") {
-			commandOutput->printf("ffRight\r\n");
+//		else if (commandToken[1] == "ffLeft") {
+//			commandOutput->printf("ffLeft\r\n");
+//			direction = LEFT;
+//			lastActionTime = millis();
+//		} else if (commandToken[1] == "ffRight") {
+//			commandOutput->printf("ffRight\r\n");
+////			//			digitalWrite(pwmA, LOW);
+////			digitalWrite(rightMotorPWM, LOW);
+////
+////			//			digitalWrite(dirB, HIGH);
+////			digitalWrite(leftMotorDir, LOW);
+////
+////			digitalWrite(leftMotorPWM, HIGH);
+////			//			digitalWrite(pwmB, HIGH);
+////			//			enableMovement(true);
+////			lastActionTime = millis();
+//		} else if (commandToken[1] == "backLeft") {
+//			commandOutput->printf("backLeft\r\n");
+////			//			digitalWrite(pwmA, LOW);
+////			digitalWrite(rightMotorPWM, LOW);
+////
+////			//			digitalWrite(dirB, HIGH);
+////			digitalWrite(leftMotorDir, LOW);
+////
+////			digitalWrite(leftMotorPWM, HIGH);
+////			//			digitalWrite(pwmB, HIGH);
+////			//			enableMovement(true);
+////			lastActionTime = millis();
+//		} else if (commandToken[1] == "backRight") {
+//			commandOutput->printf("backRight\r\n");
 //			//			digitalWrite(pwmA, LOW);
-//			digitalWrite(rightMotorPWM, LOW);
-//
-//			//			digitalWrite(dirB, HIGH);
-//			digitalWrite(leftMotorDir, LOW);
-//
-//			digitalWrite(leftMotorPWM, HIGH);
-//			//			digitalWrite(pwmB, HIGH);
-//			//			enableMovement(true);
-//			lastActionTime = millis();
-		} else if (commandToken[1] == "backLeft") {
-			commandOutput->printf("backLeft\r\n");
-//			//			digitalWrite(pwmA, LOW);
-//			digitalWrite(rightMotorPWM, LOW);
-//
-//			//			digitalWrite(dirB, HIGH);
-//			digitalWrite(leftMotorDir, LOW);
-//
-//			digitalWrite(leftMotorPWM, HIGH);
-//			//			digitalWrite(pwmB, HIGH);
-//			//			enableMovement(true);
-//			lastActionTime = millis();
-		} else if (commandToken[1] == "backRight") {
-			commandOutput->printf("backRight\r\n");
-			//			digitalWrite(pwmA, LOW);
-//			digitalWrite(rightMotorPWM, LOW);
-//
-//			//			digitalWrite(dirB, HIGH);
-//			digitalWrite(leftMotorDir, LOW);
-//
-//			digitalWrite(leftMotorPWM, HIGH);
-//			//			digitalWrite(pwmB, HIGH);
-//			//			enableMovement(true);
-//			lastActionTime = millis();
-		}
+////			digitalWrite(rightMotorPWM, LOW);
+////
+////			//			digitalWrite(dirB, HIGH);
+////			digitalWrite(leftMotorDir, LOW);
+////
+////			digitalWrite(leftMotorPWM, HIGH);
+////			//			digitalWrite(pwmB, HIGH);
+////			//			enableMovement(true);
+////			lastActionTime = millis();
+//		}
 		else if (commandToken[1] == "stop") {
 			commandOutput->printf("stop\r\n");
 //			digitalWrite(leftMotorPWM, LOW);
 //			digitalWrite(rightMotorPWM, LOW);
-			stopped = true;
-		};
+			dir = STOP;
+//			stopped = true;
+		}
+		else if (commandToken[1] == "xyp") {
+			commandOutput->printf("stop\r\n");
+//			digitalWrite(leftMotorPWM, LOW);
+//			digitalWrite(rightMotorPWM, LOW);
+			dir = STOP;
+//			stopped = true;
+		}
 
 	}
 }
@@ -184,43 +192,84 @@ void CarCommand::handleMotorTimer() {
 //	debugf("current =%d, last=%d", currentTime, lastActionTime);
 
 	if(currentTime - (lastActionTime + duration) >= 0) {
+		dir = STOP;
 		digitalWrite(leftMotorPWM, LOW);
 		digitalWrite(rightMotorPWM, LOW);
 		return;
 	}
 
-	if (stopped) {
+	if (dir == STOP) {
 		digitalWrite(leftMotorPWM, LOW);
 		digitalWrite(rightMotorPWM, LOW);
 		return;
 	}
 
-	if(direction == STRAIGHT)
-	{
-		digitalWrite(leftMotorPWM, HIGH);
-		digitalWrite(rightMotorPWM, HIGH);
-		if (vector == FORWARD) {
-			digitalWrite(leftMotorDir, FF);
-			digitalWrite(rightMotorDir, FF);
-		} else if(vector == BACK) {
-			digitalWrite(leftMotorDir, REV);
-			digitalWrite(rightMotorDir, REV);
+	int lpwm = 0;
+	int rpwm = 0;
+	int lm = 0;
+	int rm = 0;
+
+	if (tdir == STRAIGHT) {
+		if (dir == FW) {
+			lpwm = HIGH;
+			rpwm = HIGH;
+			lm = MOTOR_FW;
+			rm = MOTOR_FW;
+		} else if (dir == BK) {
+			lpwm = HIGH;
+			rpwm = HIGH;
+			lm = MOTOR_BK;
+			rm = MOTOR_BK;
 		}
-	} else if(direction == LEFT) {
-		digitalWrite(leftMotorPWM, LOW);
-		digitalWrite(rightMotorPWM, HIGH);
-		if (vector == FORWARD) {
-			digitalWrite(rightMotorDir, FF);
-		} else if(vector == BACK) {
-			digitalWrite(rightMotorDir, REV);
+	} else if (tdir == TL) {
+		lpwm = LOW;
+		rpwm = HIGH;
+		if (dir == FW) {
+			rm = MOTOR_FW;
+		} else if (dir == BK) {
+			rm = MOTOR_BK;
 		}
-	} else if(direction == RIGHT) {
-		digitalWrite(leftMotorPWM, HIGH);
-		digitalWrite(rightMotorPWM, LOW);
-		if (vector == FORWARD) {
-			digitalWrite(leftMotorDir, FF);
-		} else if(vector == BACK) {
-			digitalWrite(leftMotorDir, REV);
+	} else if (tdir == TR) {
+		lpwm = HIGH;
+		rpwm = LOW;
+		if (dir == FW) {
+			lm = MOTOR_FW;
+		} else if (dir == BK) {
+			lm = MOTOR_BK;
 		}
 	}
+
+	digitalWrite(leftMotorPWM, lpwm);
+	digitalWrite(rightMotorPWM, rpwm);
+	digitalWrite(leftMotorDir, lm);
+	digitalWrite(rightMotorDir, rm);
+
+//	if(direction == STRAIGHT)
+//	{
+//		digitalWrite(leftMotorPWM, HIGH);
+//		digitalWrite(rightMotorPWM, HIGH);
+//		if (vector == FORWARD) {
+//			digitalWrite(leftMotorDir, FF);
+//			digitalWrite(rightMotorDir, FF);
+//		} else if(vector == BACK) {
+//			digitalWrite(leftMotorDir, REV);
+//			digitalWrite(rightMotorDir, REV);
+//		}
+//	} else if(direction == LEFT) {
+//		digitalWrite(leftMotorPWM, LOW);
+//		digitalWrite(rightMotorPWM, HIGH);
+//		if (vector == FORWARD) {
+//			digitalWrite(rightMotorDir, FF);
+//		} else if(vector == BACK) {
+//			digitalWrite(rightMotorDir, REV);
+//		}
+//	} else if(direction == RIGHT) {
+//		digitalWrite(leftMotorPWM, HIGH);
+//		digitalWrite(rightMotorPWM, LOW);
+//		if (vector == FORWARD) {
+//			digitalWrite(leftMotorDir, FF);
+//		} else if(vector == BACK) {
+//			digitalWrite(leftMotorDir, REV);
+//		}
+//	}
 };

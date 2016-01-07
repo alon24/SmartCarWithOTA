@@ -10,6 +10,8 @@
 	#define WIFI_PWD "PleaseEnterPass"
 #endif
 
+int currentRbootSlot =0;
+
 //#ifndef OTA_SERVER
 //	#define OTA_SERVER "xxx2" // Put you OTA server URL Here
 //#endif
@@ -30,7 +32,13 @@ HttpServer server;
 TelnetServer telnet;
 Timer msgTimer;
 
-CarCommand carCommand(5, 4,  0, 2);
+//PINS
+#define leftMotorPwmPin 4
+#define rightMotorPwmPin 5
+#define leftMotorDirPin 2
+#define rightMotorDirPin 0
+
+CarCommand carCommand(leftMotorPwmPin, rightMotorPwmPin,  leftMotorDirPin, rightMotorDirPin);
 
 String projName = "";
 String thisBuildVersion = "";
@@ -385,7 +393,8 @@ void connectOk() {
 }
 
 void connectFail() {
-	Serial.println("Not Connectd to Station !!!");
+	Serial.println("Not Connectd to Station !!!, turning station mode network OFF");
+	WifiStation.enable(false);
 }
 
 Timer onetime;
@@ -401,44 +410,48 @@ void updateTime() {
 	updateWebSockets("heart");
 }
 
+void setupSpiffs() {
+	// mount spiffs
+	currentRbootSlot = rboot_get_current_rom();
+	#ifndef DISABLE_SPIFFS
+		if (currentRbootSlot == 0) {
+	#ifdef RBOOT_SPIFFS_0
+			debugf("trying to mount spiffs at %x, length %d", RBOOT_SPIFFS_0 + 0x40200000, SPIFF_SIZE);
+			spiffs_mount_manual(RBOOT_SPIFFS_0 + 0x40200000, SPIFF_SIZE);
+	#else
+			debugf("trying to mount spiffs at %x, length %d", 0x40300000, SPIFF_SIZE);
+			spiffs_mount_manual(0x40300000, SPIFF_SIZE);
+	#endif
+		} else {
+	#ifdef RBOOT_SPIFFS_1
+			debugf("trying to mount spiffs at %x, length %d", RBOOT_SPIFFS_1 + 0x40200000, SPIFF_SIZE);
+			spiffs_mount_manual(RBOOT_SPIFFS_1 + 0x40200000, SPIFF_SIZE);
+	#else
+			debugf("trying to mount spiffs at %x, length %d", 0x40500000, SPIFF_SIZE);
+			spiffs_mount_manual(0x40500000, SPIFF_SIZE);
+	#endif
+		}
+	#else
+		debugf("spiffs disabled");
+	#endif
+}
+
 void init() {
 	
 	Serial.begin(SERIAL_BAUD_RATE); // 115200 by default
 	Serial.systemDebugOutput(true); // Debug output to serial
+	setupSpiffs();
 	
-	// mount spiffs
-	int slot = rboot_get_current_rom();
-#ifndef DISABLE_SPIFFS
-	if (slot == 0) {
-#ifdef RBOOT_SPIFFS_0
-		debugf("trying to mount spiffs at %x, length %d", RBOOT_SPIFFS_0 + 0x40200000, SPIFF_SIZE);
-		spiffs_mount_manual(RBOOT_SPIFFS_0 + 0x40200000, SPIFF_SIZE);
-#else
-		debugf("trying to mount spiffs at %x, length %d", 0x40300000, SPIFF_SIZE);
-		spiffs_mount_manual(0x40300000, SPIFF_SIZE);
-#endif
-	} else {
-#ifdef RBOOT_SPIFFS_1
-		debugf("trying to mount spiffs at %x, length %d", RBOOT_SPIFFS_1 + 0x40200000, SPIFF_SIZE);
-		spiffs_mount_manual(RBOOT_SPIFFS_1 + 0x40200000, SPIFF_SIZE);
-#else
-		debugf("trying to mount spiffs at %x, length %d", 0x40500000, SPIFF_SIZE);
-		spiffs_mount_manual(0x40500000, SPIFF_SIZE);
-#endif
-	}
-#else
-	debugf("spiffs disabled");
-#endif
 	
 	WifiStation.enable(false);
-//	WifiStation.enable(true);
-//	WifiStation.config(WIFI_SSID, WIFI_PWD);
-//	WifiStation.waitConnection(connectOk, 20, connectFail);
+	WifiStation.enable(true);
+	WifiStation.config(WIFI_SSID, WIFI_PWD);
+	WifiStation.waitConnection(connectOk, 20, connectFail);
 
 	WifiAccessPoint.enable(true);
 	WifiAccessPoint.config("SmartCar", "", AUTH_OPEN, false, 11, 200);
 
-	Serial.printf("\r\nCurrently running rom %d.\r\n", slot);
+	Serial.printf("\r\nCurrently running rom %d.\r\n", currentRbootSlot);
 	Serial.println("Type 'help' and press enter for instructions.");
 	Serial.println();
 	

@@ -23,14 +23,11 @@ MODULES = app
 ## Windows: 
 #COM_PORT = COM5
 
-
-COM_PORT = /dev/tty.SLAB_USBtoUART
-
 # MacOS / Linux:
-#COM_PORT = /dev/tty.usbserial
+ COM_PORT = /dev/tty.SLAB_USBtoUART
 
 # Com port speed
- COM_SPEED	= 961000
+COM_SPEED	= 961000
 
 #### overridable rBoot options ####
 ## use rboot build mode

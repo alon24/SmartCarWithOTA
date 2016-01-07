@@ -38,23 +38,23 @@
 	<table>
 		<tbody>
 			<tr>
-				<td><input type="button" onmousedown="mousedownfunc('ffLeft')" value="שמאלה קדימה" onmouseup="mouseupfunc('counter')" /></td>
+				<td><input type="button" onmousedown="mousedownfunc('ffLeft')" value="שמאלה קדימה" onmouseup="mouseupfunc()" /></td>
 <!-- 				<button onclick="doSend('Move ffLeft')">שמאלה קדימה</butto>				 -->
-				<td><input class="btn" type="button" onClick="doSend('Move forward')" onmousedown="mousedownfunc('forward')" value="מעלה" onmouseup="mouseupfunc('counter')" /></td>
+				<td><input class="btn" type="button" onClick="doSend('Move forward')" onmousedown="mousedownfunc('forward')" value="מעלה" onmouseup="mouseupfunc()" onmouseout="mouseupfunc()"/></td>
 				<!-- <td> <button onclick="doSend('Move forward')">מעלה</button> </td> -->
 				<td> <button onclick="doSend('Move ffRight')">ימינה קדימה</button> </td>
 			 </tr>
 			<tr>
-				<td><input class="btn" type="button" onClick="doSend('Move left')" onmousedown="mousedownfunc('left')" value="שמאלה" onmouseup="mouseupfunc('counter')" /></td>
+				<td><input class="btn" type="button" onClick="doSend('Move left')" onmousedown="mousedownfunc('left')" value="שמאלה" onmouseup="mouseupfunc()" /></td>
 				<!-- <td> <button onclick="doSend('Move left')">שמאלה</button> </td> -->
 				<td> <button class="btn stop" onclick="doSend('Move stop')">עצור</button> </td>
-				<td><input class="btn" type="button" onClick="doSend('Move right')" onmousedown="mousedownfunc('right')" value="ימינה" onmouseup="mouseupfunc('counter')" /></td>
+				<td><input class="btn" type="button" onClick="doSend('Move right')" onmousedown="mousedownfunc('right')" value="ימינה" onmouseup="mouseupfunc()" /></td>
 				<!-- <td> <button onclick="doSend('Move right')">ימינה</button> </td> -->
 			 </tr>
 			 <tr>
 				<td> <button onclick="doSend('Move backLeft')">שמאלה אחורה</button> </td>
 				<!-- <td><input type="button" onmousedown="mousedownfunc('back')" value="למטה" onmouseup="mouseupfunc('counter')" /></td> -->
-				<td><input class="btn" type="button" onClick="doSend('Move back')" onmousedown="mousedownfunc('back')" value="למטה" onmouseup="mouseupfunc('counter')" /></td>
+				<td><input class="btn" type="button" onClick="doSend('Move back')" onmousedown="mousedownfunc('back')" value="למטה" onmouseup="mouseupfunc()" /></td>
 				<!-- <td> <button onclick="doSend('Move back')">למטה</button> </td> -->
 				<td> <button onclick="doSend('Move backRight')">ימעינה אחורה</button> </td>
 			 </tr>

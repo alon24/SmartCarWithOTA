@@ -11,20 +11,23 @@
 #include "../Services/CommandProcessing/CommandProcessingIncludes.h"
 
 //https://www.gitbook.com/book/smartarduino/user-mannual-for-esp-12e-motor-shield/details
-#define FF 0
-#define REV 1
+
+//Direcrtion
+#define FW 0
+#define BK 1
+#define STOP 2
+//#define FW_NEUTRAL 3
+
+//Turn
+#define TL 4
+#define TR 5
+#define STRAIGHT 6
+
+//Motor movements
+#define MOTOR_FW 1
+#define MOTOR_BK 0
 
 typedef Delegate<void()> carMotorDelegate;
-
-enum CarDirection {
-	STRAIGHT,
-	LEFT,
-	RIGHT
-};
-enum CarVector {
-	FORWARD,
-	BACK
-};
 
 class CarCommand
 {
@@ -34,11 +37,20 @@ public:
 	void initCommand();
 
 private:
-	bool stopped = true;
-	CarVector vector = FORWARD;
-	CarDirection direction = STRAIGHT;
 
-	int currentCmd = 0;
+	// Direction
+	int dir=FW;
+
+	// Turn Status
+	int t = 0;
+	int tdir = STRAIGHT;
+	int tcount = 0;
+
+	int x = 0; //X movement
+	int y = 0; // Y movement
+	int p = 0; //POWER precentage
+
+//	bool stopped = true;
 
 	int leftMotorPWM;
 	int rightMotorPWM;
@@ -47,23 +59,22 @@ private:
 	int duration = 200;
 
 	//--target Speed
-	int spdTargetA=1023;
+	int spdTargetLeft=1023;
 
 	//--current speed
-	int spdCurrentA=0;
+	int spdCurrentLeft=0;
 
 	//--target Speed
-	int spdTargetB = 1023;
-
+	int spdTargetRight = 1023;
 	//--current speed
-	int spdCurrentB = 0;
-	bool stopFlag =true;
+	int spdCurrentRight = 0;
+
 	long lastActionTime;
 	Timer motorTimer;
 
 	void processCarCommands(String commandLine, CommandOutput* commandOutput);
 	void handleMotorTimer();
-	void enableMovement(bool state);
+//	void enableMovement(bool state);
 };
 
 
