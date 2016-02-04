@@ -18,6 +18,9 @@ CarCommand::CarCommand(int leftMotorPWM, int rightMotorPWM, int leftMotorDir, in
 	this->leftMotorDir = leftMotorDir;
 	this->rightMotorDir = rightMotorDir;
 	debugf("CarCommand Instantiating");
+
+	pwmMotors.analogWrite(leftMotorPWM, 100);
+	pwmMotors.analogWrite(rightMotorPWM, 100);
 }
 
 CarCommand::~CarCommand()
@@ -66,7 +69,7 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 		commandOutput->printf("backRight : Move faster bk lefts\r\n");
 
 		commandOutput->printf("stop : Show example status\r\n");
-		commandOutput->printf("xyp : Send X axis, Y axis, POWER\r\n");
+		commandOutput->printf("x,y : Send X axis PWR, Y axis PWR (can be negative for reverse)\n");
 	}
 	else
 	{
@@ -164,12 +167,35 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 			dir = STOP;
 //			stopped = true;
 		}
-		else if (commandToken[1] == "xyp") {
-			commandOutput->printf("stop\r\n");
+		else if (commandToken[1].startsWith("xy")) {
+//			commandOutput->printf("XY\r\n");
+//			String st = commandToken[2];
+//			commandOutput->printf(st.c_str());
 //			digitalWrite(leftMotorPWM, LOW);
 //			digitalWrite(rightMotorPWM, LOW);
-			dir = STOP;
-//			stopped = true;
+
+			commandOutput->printf(commandToken[2].c_str());
+
+			if (y > 0) {
+				dir = FW;
+				spdTargetLeft = (abs(y), 0, 100,  0, 1023);
+				spdTargetRight= (abs(y), 0, 100,  0, 1023);
+			} else if (y == 0) {
+				dir = STOP;
+			} else {
+				dir = BK;
+			}
+
+
+			if (x > 0) {
+				dir = FW;
+				spdTargetLeft = (abs(y), 0, 100,  0, 1023);
+				spdTargetRight= (abs(y), 0, 100,  0, 1023);
+			} else if (x == 0) {
+				dir = STOP;
+			} else {
+				dir = BK;
+			}
 		}
 
 	}

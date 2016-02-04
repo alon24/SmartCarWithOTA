@@ -1,7 +1,7 @@
 #include <user_config.h>
-#include <SmingCore/SmingCore.h>
-#include <SmingCore/Network/TelnetServer.h>
-#include <SmingCore/Debug.h>
+#include <SmingCore.h>
+#include <network/TelnetServer.h>
+#include <Debug.h>
 #include <CarCommand.h>
 
 // If you want, you can define WiFi settings globally in Eclipse Environment Variables
@@ -438,7 +438,7 @@ void setupSpiffs() {
 
 void init() {
 	
-	Serial.begin(SERIAL_BAUD_RATE); // 115200 by default
+	Serial.begin(115200); // 115200 by default
 	Serial.systemDebugOutput(true); // Debug output to serial
 	setupSpiffs();
 	
@@ -465,6 +465,7 @@ void init() {
 	//Change CPU freq. to 160MHZ
 	System.setCpuFrequency(eCF_160MHz);
 
-	// Run WEB server on system ready
-	System.onReady(StartServers);
+//	// Run WEB server on system ready
+//	System.onReady(StartServers);
+	StartServers();
 }

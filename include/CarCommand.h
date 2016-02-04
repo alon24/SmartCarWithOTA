@@ -6,7 +6,7 @@
 #ifndef SMINGCORE_EXAMPLE_COMMAND_H_
 #define SMINGCORE_EXAMPLE_COMMAND_H_
 
-#include <SmingCore/SmingCore.h>
+#include <SmingCore.h>
 #include "WString.h"
 #include "../Services/CommandProcessing/CommandProcessingIncludes.h"
 
@@ -38,6 +38,9 @@ public:
 
 private:
 
+	int lastY = 0;
+	int currentX = 0;
+
 	// Direction
 	int dir=FW;
 
@@ -46,9 +49,8 @@ private:
 	int tdir = STRAIGHT;
 	int tcount = 0;
 
-	int x = 0; //X movement
-	int y = 0; // Y movement
-	int p = 0; //POWER precentage
+	int x = 0; //X movement percent
+	int y = 0; // Y movement percent
 
 //	bool stopped = true;
 
@@ -71,6 +73,8 @@ private:
 
 	long lastActionTime;
 	Timer motorTimer;
+
+	DriverPWM pwmMotors;
 
 	void processCarCommands(String commandLine, CommandOutput* commandOutput);
 	void handleMotorTimer();
