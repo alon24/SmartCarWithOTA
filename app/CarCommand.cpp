@@ -69,7 +69,7 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 		commandOutput->printf("backRight : Move faster bk lefts\r\n");
 
 		commandOutput->printf("stop : Show example status\r\n");
-		commandOutput->printf("x,y : Send X axis PWR, Y axis PWR (can be negative for reverse)\n");
+		commandOutput->printf("xy xValue yValue: Send X axis PWR, Y axis PWR (can be negative for reverse)\n");
 	}
 	else
 	{
@@ -119,47 +119,6 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 			tcount = 0;
 			lastActionTime = millis();
 		}
-//		else if (commandToken[1] == "ffLeft") {
-//			commandOutput->printf("ffLeft\r\n");
-//			direction = LEFT;
-//			lastActionTime = millis();
-//		} else if (commandToken[1] == "ffRight") {
-//			commandOutput->printf("ffRight\r\n");
-////			//			digitalWrite(pwmA, LOW);
-////			digitalWrite(rightMotorPWM, LOW);
-////
-////			//			digitalWrite(dirB, HIGH);
-////			digitalWrite(leftMotorDir, LOW);
-////
-////			digitalWrite(leftMotorPWM, HIGH);
-////			//			digitalWrite(pwmB, HIGH);
-////			//			enableMovement(true);
-////			lastActionTime = millis();
-//		} else if (commandToken[1] == "backLeft") {
-//			commandOutput->printf("backLeft\r\n");
-////			//			digitalWrite(pwmA, LOW);
-////			digitalWrite(rightMotorPWM, LOW);
-////
-////			//			digitalWrite(dirB, HIGH);
-////			digitalWrite(leftMotorDir, LOW);
-////
-////			digitalWrite(leftMotorPWM, HIGH);
-////			//			digitalWrite(pwmB, HIGH);
-////			//			enableMovement(true);
-////			lastActionTime = millis();
-//		} else if (commandToken[1] == "backRight") {
-//			commandOutput->printf("backRight\r\n");
-//			//			digitalWrite(pwmA, LOW);
-////			digitalWrite(rightMotorPWM, LOW);
-////
-////			//			digitalWrite(dirB, HIGH);
-////			digitalWrite(leftMotorDir, LOW);
-////
-////			digitalWrite(leftMotorPWM, HIGH);
-////			//			digitalWrite(pwmB, HIGH);
-////			//			enableMovement(true);
-////			lastActionTime = millis();
-//		}
 		else if (commandToken[1] == "stop") {
 			commandOutput->printf("stop\r\n");
 //			digitalWrite(leftMotorPWM, LOW);
@@ -168,22 +127,44 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 //			stopped = true;
 		}
 		else if (commandToken[1].startsWith("xy")) {
-//			commandOutput->printf("XY\r\n");
-//			String st = commandToken[2];
-//			commandOutput->printf(st.c_str());
-//			digitalWrite(leftMotorPWM, LOW);
-//			digitalWrite(rightMotorPWM, LOW);
 
-			commandOutput->printf(commandToken[2].c_str());
+			int tmpX = commandToken[2].toInt();
+			int tmpY = commandToken[3].toInt();
+			int rightPwm =0;
+			int leftPwm = 0;
+			int rightDir = 0;
+			int leftDir = 0;
 
-			if (y > 0) {
+			if (tmpY > 0) {
 				dir = FW;
-				spdTargetLeft = (abs(y), 0, 100,  0, 1023);
-				spdTargetRight= (abs(y), 0, 100,  0, 1023);
-			} else if (y == 0) {
+				spdTargetLeft = (abs(tmpY), 0, 100,  0, 1023);
+				spdTargetRight= spdTargetLeft;
+			} else if (tmpY == 0) {
 				dir = STOP;
+				break;
 			} else {
 				dir = BK;
+				spdTargetLeft = -(abs(tmpY), 0, 100,  0, 1023);
+				spdTargetRight= spdTargetLeft;
+			}
+
+			if (dir != STOP) {
+				if (tmpX == 0) {
+					break;
+				}
+
+				if (x>0) {
+					rightDir = HIGH;
+					leftDir = LOW;
+				} else {
+					leftDir = HIGH;
+					rightDir = LOW;
+				}
+
+				if (y<0) {
+					rightDir = switchDir(rightDir);
+					leftDir = switchDir(leftDir);
+				}
 			}
 
 
@@ -199,6 +180,10 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 		}
 
 	}
+}
+
+int CarCommand::switchDir(int state) {
+	return state == HIGH ? LOW : HIGH;
 }
 
 //void CarCommand::enableMovement(bool state) {

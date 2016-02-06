@@ -79,6 +79,8 @@ private:
 	void processCarCommands(String commandLine, CommandOutput* commandOutput);
 	void handleMotorTimer();
 //	void enableMovement(bool state);
+
+	int switchDir(int state);
 };
 
 

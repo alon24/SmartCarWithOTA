@@ -12,6 +12,17 @@
 
 int currentRbootSlot =0;
 
+enum class BlinkState {
+	NOT_CONNECTED = 0,
+	CONNECTED_AP_ONLY = 1,
+	CONNECTED_BOTH = 2,
+	AT_LEASET_ONE_CONNECTED =3
+};
+
+
+BlinkState led0State = BlinkState::NOT_CONNECTED
+Timer blinkStateTimer;
+
 //#ifndef OTA_SERVER
 //	#define OTA_SERVER "xxx2" // Put you OTA server URL Here
 //#endif
@@ -384,6 +395,11 @@ void StartServers()
 
 	initCarCommands();
 }
+
+void blinkStateLedUpdate() {
+
+}
+
 
 void connectOk() {
 	debugf("Connected to STA ip=%s", WifiStation.getIP().toString().c_str());
