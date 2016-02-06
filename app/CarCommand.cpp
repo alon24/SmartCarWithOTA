@@ -141,7 +141,6 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 				spdTargetRight= spdTargetLeft;
 			} else if (tmpY == 0) {
 				dir = STOP;
-				break;
 			} else {
 				dir = BK;
 				spdTargetLeft = -(abs(tmpY), 0, 100,  0, 1023);
@@ -150,23 +149,22 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 
 			if (dir != STOP) {
 				if (tmpX == 0) {
-					break;
 				}
+				else {
+					if (x>0) {
+						rightDir = HIGH;
+						leftDir = LOW;
+					} else {
+						leftDir = HIGH;
+						rightDir = LOW;
+					}
 
-				if (x>0) {
-					rightDir = HIGH;
-					leftDir = LOW;
-				} else {
-					leftDir = HIGH;
-					rightDir = LOW;
-				}
-
-				if (y<0) {
-					rightDir = switchDir(rightDir);
-					leftDir = switchDir(leftDir);
+					if (y<0) {
+						rightDir = switchDir(rightDir);
+						leftDir = switchDir(leftDir);
+					}
 				}
 			}
-
 
 			if (x > 0) {
 				dir = FW;
@@ -178,7 +176,6 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 				dir = BK;
 			}
 		}
-
 	}
 }
 
