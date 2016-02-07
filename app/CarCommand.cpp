@@ -188,7 +188,7 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 
 			int x = commandToken[2].toInt();
 			int y = commandToken[3].toInt();
-
+			debugf("1:y=%i, abs(y) =%i, leftP=%i,rightP=%i",y, abs(y), leftPwm, rightPwm);
 			//check direction to move(needed for knowing which side to move - wheels)
 			if (y > 0) {
 				dir = FW;
@@ -227,8 +227,8 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 
 			if (dir != STOP) {
 				//first set motors to run (power)
-				leftPwm = (abs(y), 0, 100,  0, 1023);
-				rightPwm = (abs(y), 0, 100,  0, 1023);
+				leftPwm = map(abs(y), 0, 100,  0, 1023);
+				rightPwm = map(abs(y), 0, 100,  0, 1023);
 
 				//check if we want to move right
 				if (dir == FW) {
@@ -262,7 +262,7 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 				rightPwm = 0;
 			}
 
-			debugf("inside command:leftD=%i,leftP=%i,rightD-%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
+			debugf("inside command:leftD=%i,leftP=%i,rightD=%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
 		}
 
 		drive(leftDir, leftPwm, rightDir, rightPwm);
