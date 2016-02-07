@@ -49,8 +49,8 @@ private:
 	int tdir = STRAIGHT;
 	int tcount = 0;
 
-	int x = 0; //X movement percent
-	int y = 0; // Y movement percent
+//	int x = 0; //X movement percent
+//	int y = 0; // Y movement percent
 
 //	bool stopped = true;
 
@@ -76,11 +76,16 @@ private:
 
 	DriverPWM pwmMotors;
 
+	int i = 0;
+	bool countUp = true;
+	bool countDown = false;
+
 	void processCarCommands(String commandLine, CommandOutput* commandOutput);
 	void handleMotorTimer();
-//	void enableMovement(bool state);
+	void drive(int leftDir, int leftPwm, int rightDir, int rightPwm);
 
 	int switchDir(int state);
+	void doPWM();
 };
 
 

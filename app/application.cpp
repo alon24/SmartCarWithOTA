@@ -61,7 +61,7 @@ Timer msgTimer;
 #define rightMotorDirPin 0
 
 CarCommand carCommand(leftMotorPwmPin, rightMotorPwmPin,  leftMotorDirPin, rightMotorDirPin);
-void changeBlinkState(BlinkState state);
+//void changeBlinkState(BlinkState state);
 
 String projName = "";
 String thisBuildVersion = "";
@@ -340,7 +340,7 @@ int msgCount = 0;
 void wsConnected(WebSocket& socket)
 {
 	Serial.printf("Socket connected\r\n");
-	changeBlinkState(BlinkState::AT_LEASET_ONE_CONNECTED);
+//	changeBlinkState(BlinkState::AT_LEASET_ONE_CONNECTED);
 }
 
 void wsMessageReceived(WebSocket& socket, const String& message)
@@ -358,11 +358,11 @@ void wsBinaryReceived(WebSocket& socket, uint8_t* data, size_t size)
 void wsDisconnected(WebSocket& socket)
 {
 	Serial.printf("Socket disconnected");
-	if (WifiStation.isConnected()) {
-		changeBlinkState(BlinkState::CONNECTED_BOTH);
-	} else {
-		changeBlinkState(BlinkState::CONNECTED_AP_ONLY);
-	}
+//	if (WifiStation.isConnected()) {
+//		changeBlinkState(BlinkState::CONNECTED_BOTH);
+//	} else {
+//		changeBlinkState(BlinkState::CONNECTED_AP_ONLY);
+//	}
 }
 
 void processApplicationCommands(String commandLine, CommandOutput* commandOutput)
@@ -414,97 +414,97 @@ void StartServers()
 	initCarCommands();
 }
 
-void changeBlinkState(BlinkState state) {
-//	debugf("New state found %s", state.)
-	blinkStateTimer.stop();
-	led0State = state;
-	blinkPart =0;
-	blinkStateTimer.startOnce();
-}
-
-void blinkStateLedUpdate() {
-//	if (blinkPart == -1) {
-//		return;
+//void changeBlinkState(BlinkState state) {
+////	debugf("New state found %s", state.)
+//	blinkStateTimer.stop();
+//	led0State = state;
+//	blinkPart =0;
+//	blinkStateTimer.startOnce();
+//}
+//
+//void blinkStateLedUpdate() {
+////	if (blinkPart == -1) {
+////		return;
+////	}
+//	int shortPause = 250;
+//	int longPause = 450;
+//
+//	if (led0State == BlinkState::NOT_CONNECTED) {
+//		//blink every 50ms
+//		switch (blinkPart) {
+//			case 0:
+//				digitalWrite(LED_PIN, HIGH);
+//				blinkPart++;
+//				blinkStateTimer.initializeMs(400, blinkStateLedUpdate).startOnce();
+//				break;
+//			case 1:
+//				digitalWrite(LED_PIN, LOW);
+//				blinkPart=0;
+//				blinkStateTimer.initializeMs(400, blinkStateLedUpdate).startOnce();
+//				break;
+//		}
 //	}
-	int shortPause = 250;
-	int longPause = 450;
-
-	if (led0State == BlinkState::NOT_CONNECTED) {
-		//blink every 50ms
-		switch (blinkPart) {
-			case 0:
-				digitalWrite(LED_PIN, HIGH);
-				blinkPart++;
-				blinkStateTimer.initializeMs(400, blinkStateLedUpdate).startOnce();
-				break;
-			case 1:
-				digitalWrite(LED_PIN, LOW);
-				blinkPart=0;
-				blinkStateTimer.initializeMs(400, blinkStateLedUpdate).startOnce();
-				break;
-		}
-	}
-	else if (led0State == BlinkState::CONNECTED_AP_ONLY) {
-		//blink 1 short 1 long
-		switch (blinkPart) {
-			case 0:
-				digitalWrite(LED_PIN, HIGH);
-				blinkPart++;
-				blinkStateTimer.initializeMs(shortPause, blinkStateLedUpdate).startOnce();
-				break;
-			case 1:
-				digitalWrite(LED_PIN, LOW);
-				blinkPart++;
-				blinkStateTimer.initializeMs(shortPause, blinkStateLedUpdate).startOnce();
-				break;
-			case 2:
-				digitalWrite(LED_PIN, HIGH);
-				blinkPart++;
-				blinkStateTimer.initializeMs(longPause, blinkStateLedUpdate).startOnce();
-				break;
-			case 3:
-				digitalWrite(LED_PIN, LOW);
-				blinkPart=0;
-				blinkStateTimer.initializeMs(longPause, blinkStateLedUpdate).startOnce();
-				break;
-		}
-	}
-	else if (led0State == BlinkState::CONNECTED_BOTH) {
-	//blink 1 long 1 short
-	switch (blinkPart) {
-			case 0:
-				digitalWrite(LED_PIN, HIGH);
-				blinkPart++;
-				blinkStateTimer.initializeMs(longPause, blinkStateLedUpdate).startOnce();
-				break;
-			case 1:
-				digitalWrite(LED_PIN, LOW);
-				blinkPart++;
-				blinkStateTimer.initializeMs(longPause, blinkStateLedUpdate).startOnce();
-				break;
-			case 2:
-				digitalWrite(LED_PIN, HIGH);
-				blinkPart++;
-				blinkStateTimer.initializeMs(shortPause, blinkStateLedUpdate).startOnce();
-				break;
-			case 3:
-				digitalWrite(LED_PIN, LOW);
-				blinkPart=0;
-				blinkStateTimer.initializeMs(shortPause, blinkStateLedUpdate).startOnce();
-				break;
-		}
-	}
-	else if (led0State == BlinkState::AT_LEASET_ONE_CONNECTED) {
-			//constant
-		digitalWrite(LED_PIN, LOW);
-		}
-}
+//	else if (led0State == BlinkState::CONNECTED_AP_ONLY) {
+//		//blink 1 short 1 long
+//		switch (blinkPart) {
+//			case 0:
+//				digitalWrite(LED_PIN, HIGH);
+//				blinkPart++;
+//				blinkStateTimer.initializeMs(shortPause, blinkStateLedUpdate).startOnce();
+//				break;
+//			case 1:
+//				digitalWrite(LED_PIN, LOW);
+//				blinkPart++;
+//				blinkStateTimer.initializeMs(shortPause, blinkStateLedUpdate).startOnce();
+//				break;
+//			case 2:
+//				digitalWrite(LED_PIN, HIGH);
+//				blinkPart++;
+//				blinkStateTimer.initializeMs(longPause, blinkStateLedUpdate).startOnce();
+//				break;
+//			case 3:
+//				digitalWrite(LED_PIN, LOW);
+//				blinkPart=0;
+//				blinkStateTimer.initializeMs(longPause, blinkStateLedUpdate).startOnce();
+//				break;
+//		}
+//	}
+//	else if (led0State == BlinkState::CONNECTED_BOTH) {
+//	//blink 1 long 1 short
+//	switch (blinkPart) {
+//			case 0:
+//				digitalWrite(LED_PIN, HIGH);
+//				blinkPart++;
+//				blinkStateTimer.initializeMs(longPause, blinkStateLedUpdate).startOnce();
+//				break;
+//			case 1:
+//				digitalWrite(LED_PIN, LOW);
+//				blinkPart++;
+//				blinkStateTimer.initializeMs(longPause, blinkStateLedUpdate).startOnce();
+//				break;
+//			case 2:
+//				digitalWrite(LED_PIN, HIGH);
+//				blinkPart++;
+//				blinkStateTimer.initializeMs(shortPause, blinkStateLedUpdate).startOnce();
+//				break;
+//			case 3:
+//				digitalWrite(LED_PIN, LOW);
+//				blinkPart=0;
+//				blinkStateTimer.initializeMs(shortPause, blinkStateLedUpdate).startOnce();
+//				break;
+//		}
+//	}
+//	else if (led0State == BlinkState::AT_LEASET_ONE_CONNECTED) {
+//			//constant
+//		digitalWrite(LED_PIN, LOW);
+//		}
+//}
 
 
 void connectOk() {
 	debugf("Connected to STA ip=%s", WifiStation.getIP().toString().c_str());
 //	checkNeedsOTAUpdate();
-	changeBlinkState(BlinkState::CONNECTED_BOTH);
+//	changeBlinkState(BlinkState::CONNECTED_BOTH);
 }
 
 void connectFail() {
@@ -579,9 +579,11 @@ void init() {
 //	onetime.initializeMs(10000, StartServers).startOnce();
 	//Change CPU freq. to 160MHZ
 	System.setCpuFrequency(eCF_160MHz);
-	blinkStateTimer.setCallback(blinkStateLedUpdate);
-	blinkStateTimer.setIntervalMs(120);
-	blinkStateTimer.start(true);
+
+
+//	blinkStateTimer.setCallback(blinkStateLedUpdate);
+//	blinkStateTimer.setIntervalMs(120);
+//	blinkStateTimer.start(true);
 
 //	// Run WEB server on system ready
 //	System.onReady(StartServers);
