@@ -39,6 +39,7 @@ public:
 private:
 
 	int lastY = 0;
+	int lastX = 0;
 	int currentX = 0;
 
 	// Direction
@@ -84,7 +85,7 @@ private:
 	void handleMotorTimer();
 	void drive(int leftDir, int leftPwm, int rightDir, int rightPwm);
 
-	int switchDir(int state);
+//	int switchDir(int state);
 	void doPWM();
 };
 

@@ -186,51 +186,75 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 		}
 		else if (commandToken[1].startsWith("xy")) {
 
-			int tmpX = commandToken[2].toInt();
-			int tmpY = commandToken[3].toInt();
+			int x = commandToken[2].toInt();
+			int y = commandToken[3].toInt();
 
-			if (tmpY > 0) {
+			//check direction to move(needed for knowing which side to move - wheels)
+			if (y > 0) {
 				dir = FW;
-				pwmMotors.noAnalogWrite(rightMotorPWM);
-				rightDir = HIGH;
-//				spdTargetLeft = (abs(tmpY), 0, 100,  0, 1023);
-//				spdTargetRight= spdTargetLeft;
-			} else if (tmpY == 0) {
+			} else if (y == 0) {
 				dir = STOP;
 			} else {
 				dir = BK;
-//				spdTargetLeft = -(abs(tmpY), 0, 100,  0, 1023);
-//				spdTargetRight= spdTargetLeft;
+			}
+
+			// if currently we just do right or left, keep the last heading (lastY)
+			if (x != 0) {
+				if (lastY != 0) {
+					if (lastY > 0) {
+						dir = FW;
+						y = lastY;
+					}
+					else {
+						dir = BK;
+						y = lastY;
+					}
+				}
+			}
+
+			lastY = y;
+			lastX = x;
+
+			if (dir != STOP) {
+				if (x>0) {
+					tdir = TR;
+				} else if (x<0) {
+					tdir = TL;
+				} else {
+					tdir = STRAIGHT;
+				}
 			}
 
 			if (dir != STOP) {
-				//first set motors to run
-				leftPwm = (abs(tmpY), 0, 100,  0, 1023);
-				rightPwm = (abs(tmpY), 0, 100,  0, 1023);
+				//first set motors to run (power)
+				leftPwm = (abs(y), 0, 100,  0, 1023);
+				rightPwm = (abs(y), 0, 100,  0, 1023);
 
-
-				if (tmpX>0) {
-					rightDir = HIGH;
-					leftDir = LOW;
-//					leftPwm = 0;
-				} else if (tmpX<0){
-					leftDir = HIGH;
-					rightDir = LOW;
-//					rightPwm = 0;
+				//check if we want to move right
+				if (dir == FW) {
+					if (tdir == TL) {
+						rightDir = HIGH;
+						leftPwm = 0;
+					} else if (tdir == TR) {
+						leftDir = HIGH;
+						rightPwm = 0;
+					}else if (tdir == STRAIGHT) {
+						leftDir = HIGH;
+						rightDir = HIGH;
+					}
 				}
-				else if (dir == FW)
+				else if (dir == BK)
 				{
-					leftDir = HIGH;
-					rightDir = HIGH;
-				}
-				else {
-					leftDir = LOW;
-					rightDir = LOW;
-				}
-
-				if (dir == FW && tmpX != 0) {
-					rightDir = switchDir(rightDir);
-					leftDir = switchDir(leftDir);
+					if (tdir == TL) {
+						rightDir = LOW;
+						leftPwm = 0;
+					} else if (tdir == TR) {
+						leftDir = LOW;
+						rightPwm = 0;
+					}else if (tdir == STRAIGHT) {
+						leftDir = LOW;
+						rightDir = LOW;
+					}
 				}
 			}
 			else {
@@ -246,9 +270,9 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 	}
 }
 
-int CarCommand::switchDir(int state) {
-	return state == HIGH ? LOW : HIGH;
-}
+//int CarCommand::switchDir(int state) {
+//	return state == HIGH ? LOW : HIGH;
+//}
 
 void CarCommand::drive(int leftDir, int leftPwm, int rightDir, int rightPwm) {
 	debugf("drive command:leftD=%i,leftP=%i,rightD-%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
@@ -272,7 +296,7 @@ void CarCommand::drive(int leftDir, int leftPwm, int rightDir, int rightPwm) {
 
 //Stop the car
 void CarCommand::handleMotorTimer() {
-//	drive(0,0,0,0);
+	drive(0,0,0,0);
 
 //	long currentTime = millis();
 ////	debugf("current =%d, last=%d", currentTime, lastActionTime);
