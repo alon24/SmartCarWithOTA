@@ -1,5 +1,5 @@
 /*
- * Debug.cpp
+ * CarCommand.cpp
  *
  */
 
@@ -18,12 +18,6 @@ CarCommand::CarCommand(int leftMotorPWM, int rightMotorPWM, int leftMotorDir, in
 	this->leftMotorDir = leftMotorDir;
 	this->rightMotorDir = rightMotorDir;
 	debugf("CarCommand Instantiating");
-
-//	uint8_t pins[8] = { 4, 5, 0, 2, 15, 13, 12, 14 }; // List of pins that you want to connect to pwm
-//	HardwarePWM HW_pwm(pins, 8);
-
-//	pwmMotors.analogWrite(leftMotorPWM, 100);
-//	pwmMotors.analogWrite(rightMotorPWM, 100);
 }
 
 CarCommand::~CarCommand()
@@ -38,11 +32,6 @@ void CarCommand::initCommand()
 	digitalWrite(leftMotorDir, HIGH);
 	pinMode(rightMotorDir, OUTPUT);
 	digitalWrite(rightMotorDir, HIGH);
-
-//	pinMode(leftMotorPWM, OUTPUT);
-//	pinMode(rightMotorPWM, OUTPUT);
-//	digitalWrite(leftMotorPWM, LOW);
-//	digitalWrite(rightMotorPWM, LOW);
 
 	pwmMotors.initialize();
 
@@ -108,18 +97,6 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 	if (numToken == 1)
 	{
 		commandOutput->printf("Move Commands available : \r\n");
-//		commandOutput->printf("faster   : Set example status ON\r\n");
-//		commandOutput->printf("slower  : Set example status OFF\r\n");
-//		commandOutput->printf("forward : Show example status\r\n");
-//		commandOutput->printf("back : Show example status\r\n");
-//		commandOutput->printf("left : Show example status\r\n");
-//		commandOutput->printf("right : Show example status\r\n");
-//
-//		commandOutput->printf("ffLeft : Move faster ff left\r\n");
-//		commandOutput->printf("ffRight : Move faster ff right\r\n");
-//		commandOutput->printf("backLeft : Move faster bk left\r\n");
-//		commandOutput->printf("backRight : Move faster bk lefts\r\n");
-
 		commandOutput->printf("stop : Show example status\r\n");
 		commandOutput->printf("xy xValue yValue: Send X axis PWR, Y axis PWR (can be negative for reverse)\n");
 	}
@@ -130,76 +107,23 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 			motorTimer.stop();
 		}
 
-		if (commandToken[1] == "faster")
-		{
-			commandOutput->printf("faster\r\n");
-		}
-		else if (commandToken[1] == "slower") {
-			commandOutput->printf("slower\r\n");
-		}
-		else if (commandToken[1] == "forward") {
-			commandOutput->printf("forward\r\n");
-//			enableMovement(true);
-//
-////			digitalWrite(pwmA, LOW);
-////			digitalWrite(pwmB, LOW);
-//
-//			digitalWrite(leftMotorDir, LOW);
-//			digitalWrite(rightMotorDir, LOW);
-//
-////			digitalWrite(pwmA, HIGH);
-////			digitalWrite(pwmB, HIGH);
-
-			dir = FW;
-			tdir = STRAIGHT;
-//			stopped = false;
-			lastActionTime = millis();
-		}
-		else if (commandToken[1] == "back") {
-			commandOutput->printf("back\r\n");
-			dir = BK;
-			tdir = STRAIGHT;
-//			stopped = false;
-			lastActionTime = millis();
-		}
-		else if (commandToken[1] == "left") {
-			commandOutput->printf("left\r\n");
-			dir = FW;
-			tdir = TL;
-			tcount = 0;
-			lastActionTime = millis();
-		}
-		else if (commandToken[1] == "right") {
-			commandOutput->printf("right\r\n");
-			dir = FW;
-			tdir =TR;
-			tcount = 0;
-			lastActionTime = millis();
-		}
-		else if (commandToken[1] == "stop") {
-			commandOutput->printf("stop\r\n");
-			drive(0,0,0,0);
-//			digitalWrite(leftMotorPWM, LOW);
-//			digitalWrite(rightMotorPWM, LOW);
-			dir = STOP;
-//			stopped = true;
-		}
-		else if (commandToken[1].startsWith("xy")) {
+		if (commandToken[1].startsWith("xy")) {
 
 			int x = commandToken[2].toInt();
 			int y = commandToken[3].toInt();
-			debugf("1:y=%i, abs(y) =%i, leftP=%i,rightP=%i",y, abs(y), leftPwm, rightPwm);
+//			debugf("1:y=%i, abs(y) =%i, leftP=%i,rightP=%i",y, abs(y), leftPwm, rightPwm);
 			//check direction to move(needed for knowing which side to move - wheels)
 			if (y > 0) {
 				dir = FW;
 			} else if (y == 0) {
 				dir = STOP;
-			} else {
+			}
+			else {
 				dir = BK;
 			}
 
 			// if currently we just do right or left, keep the last heading (lastY)
-			if (x != 0) {
+			if (x != 0 && y == 0) {
 				if (lastY != 0) {
 					if (lastY > 0) {
 						dir = FW;
@@ -223,10 +147,8 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 				} else {
 					tdir = STRAIGHT;
 				}
-			}
 
-			if (dir != STOP) {
-				//first set motors to run (power)
+				//set motors to run (power)
 				leftPwm = map(abs(y), 0, 100,  0, 1023);
 				rightPwm = map(abs(y), 0, 100,  0, 1023);
 
@@ -262,17 +184,13 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 				rightPwm = 0;
 			}
 
-			debugf("inside command:leftD=%i,leftP=%i,rightD=%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
+//			debugf("inside command:leftD=%i,leftP=%i,rightD=%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
 		}
 
 		drive(leftDir, leftPwm, rightDir, rightPwm);
 		motorTimer.startOnce();
 	}
 }
-
-//int CarCommand::switchDir(int state) {
-//	return state == HIGH ? LOW : HIGH;
-//}
 
 void CarCommand::drive(int leftDir, int leftPwm, int rightDir, int rightPwm) {
 	debugf("drive command:leftD=%i,leftP=%i,rightD-%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
@@ -297,60 +215,4 @@ void CarCommand::drive(int leftDir, int leftPwm, int rightDir, int rightPwm) {
 //Stop the car
 void CarCommand::handleMotorTimer() {
 	drive(0,0,0,0);
-
-//	long currentTime = millis();
-////	debugf("current =%d, last=%d", currentTime, lastActionTime);
-//
-//	if(currentTime - (lastActionTime + duration) >= 0) {
-//		dir = STOP;
-//		digitalWrite(leftMotorPWM, LOW);
-//		digitalWrite(rightMotorPWM, LOW);
-//		return;
-//	}
-//
-//	if (dir == STOP) {
-//		digitalWrite(leftMotorPWM, LOW);
-//		digitalWrite(rightMotorPWM, LOW);
-//		return;
-//	}
-//
-//	int lpwm = 0;
-//	int rpwm = 0;
-//	int lm = 0;
-//	int rm = 0;
-//
-//	if (tdir == STRAIGHT) {
-//		if (dir == FW) {
-//			lpwm = HIGH;
-//			rpwm = HIGH;
-//			lm = MOTOR_FW;
-//			rm = MOTOR_FW;
-//		} else if (dir == BK) {
-//			lpwm = HIGH;
-//			rpwm = HIGH;
-//			lm = MOTOR_BK;
-//			rm = MOTOR_BK;
-//		}
-//	} else if (tdir == TL) {
-//		lpwm = LOW;
-//		rpwm = HIGH;
-//		if (dir == FW) {
-//			rm = MOTOR_FW;
-//		} else if (dir == BK) {
-//			rm = MOTOR_BK;
-//		}
-//	} else if (tdir == TR) {
-//		lpwm = HIGH;
-//		rpwm = LOW;
-//		if (dir == FW) {
-//			lm = MOTOR_FW;
-//		} else if (dir == BK) {
-//			lm = MOTOR_BK;
-//		}
-//	}
-//
-//	digitalWrite(leftMotorPWM, lpwm);
-//	digitalWrite(rightMotorPWM, rpwm);
-//	digitalWrite(leftMotorDir, lm);
-//	digitalWrite(rightMotorDir, rm);
 };

@@ -85,7 +85,6 @@ private:
 	void handleMotorTimer();
 	void drive(int leftDir, int leftPwm, int rightDir, int rightPwm);
 
-//	int switchDir(int state);
 	void doPWM();
 };
 
