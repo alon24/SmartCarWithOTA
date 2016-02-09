@@ -1,9 +1,5 @@
-#include <user_config.h>
-#include <SmingCore.h>
-#include <network/TelnetServer.h>
-#include <Debug.h>
+#include "SmingCore.h"
 #include <CarCommand.h>
-#include <FiniteStateMachine.h>
 
 // If you want, you can define WiFi settings globally in Eclipse Environment Variables
 #ifndef WIFI_SSID

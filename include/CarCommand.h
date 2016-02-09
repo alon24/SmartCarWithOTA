@@ -6,9 +6,7 @@
 #ifndef SMINGCORE_EXAMPLE_COMMAND_H_
 #define SMINGCORE_EXAMPLE_COMMAND_H_
 
-#include <SmingCore.h>
-#include "WString.h"
-#include "../Services/CommandProcessing/CommandProcessingIncludes.h"
+#include "SmingCore.h"
 
 //https://www.gitbook.com/book/smartarduino/user-mannual-for-esp-12e-motor-shield/details
 
@@ -75,7 +73,8 @@ private:
 	long lastActionTime;
 	Timer motorTimer;
 
-	DriverPWM pwmMotors;
+	HardwarePWM *pwmMotors;
+//	DriverPWM pwmMotors;
 
 	int i = 0;
 	bool countUp = true;
@@ -85,7 +84,7 @@ private:
 	void handleMotorTimer();
 	void drive(int leftDir, int leftPwm, int rightDir, int rightPwm);
 
-	void doPWM();
+	void testPWM();
 };
 
 

@@ -5,8 +5,7 @@
  *      Author: ilan
  */
 #include "../include/configuration.h"
-
-#include <SmingCore/SmingCore.h>
+#include "SmingCore.h"
 
 SmartCarConfig ActiveConfig;
 

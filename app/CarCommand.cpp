@@ -5,18 +5,16 @@
 
 #include <CarCommand.h>
 
-/*
- * dirA = leftMotorDir
- * dirB = rightMotorDir
- * pwmA = leftMotorPWM
- * pwmB = rightMotorPWM
- */
 CarCommand::CarCommand(int leftMotorPWM, int rightMotorPWM, int leftMotorDir, int rightMotorDir)
 {
 	this->leftMotorPWM = leftMotorPWM;
 	this->rightMotorPWM = rightMotorPWM;
 	this->leftMotorDir = leftMotorDir;
 	this->rightMotorDir = rightMotorDir;
+
+	uint8_t pins[2] = { (uint8_t)leftMotorPWM, (uint8_t)rightMotorPWM }; // List of pins that you want to connect to pwm
+
+	pwmMotors = new HardwarePWM(pins, 2);
 	debugf("CarCommand Instantiating");
 }
 
@@ -33,19 +31,17 @@ void CarCommand::initCommand()
 	pinMode(rightMotorDir, OUTPUT);
 	digitalWrite(rightMotorDir, HIGH);
 
-	pwmMotors.initialize();
-
 	//Check and act upon car commands
 	motorTimer.setCallback(carMotorDelegate(&CarCommand::handleMotorTimer, this));
 	motorTimer.setIntervalMs(100);
 
-//	motorTimer.setCallback(carMotorDelegate(&CarCommand::doPWM, this));
+//	motorTimer.setCallback(carMotorDelegate(&CarCommand::testPWM, this));
 //	motorTimer.setIntervalMs(1000);
 //	motorTimer.start(true);
 }
 
 
-void CarCommand::doPWM()
+void CarCommand::testPWM()
 {
 //	if(countUp){
 //		i++;
@@ -67,12 +63,12 @@ void CarCommand::doPWM()
 		i = 100;
 		countUp = false;
 		countDown = true;
-		pwmMotors.analogWrite(leftMotorPWM, 1023);
+		pwmMotors->analogWrite(leftMotorPWM, 1023);
 	}else {
 		i = 1;
 		countUp = true;
 		countDown = false;
-		pwmMotors.noAnalogWrite(leftMotorPWM);
+		pwmMotors->analogWrite(leftMotorPWM,0);
 //		pwmMotors.analogWrite(leftMotorPWM, 1);
 	}
 
@@ -98,7 +94,7 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 	{
 		commandOutput->printf("Move Commands available : \r\n");
 		commandOutput->printf("stop : Show example status\r\n");
-		commandOutput->printf("xy xValue yValue: Send X axis PWR, Y axis PWR (can be negative for reverse)\n");
+		commandOutput->printf("xyz xValue yValue: Send X,Y and Z PWR (X,Y can be negative for reverse)\n");
 	}
 	else
 	{
@@ -107,10 +103,12 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 			motorTimer.stop();
 		}
 
-		if (commandToken[1].startsWith("xy")) {
+		if (commandToken[1].startsWith("xyz")) {
 
 			int x = commandToken[2].toInt();
 			int y = commandToken[3].toInt();
+			int z = commandToken[4].toInt();
+
 //			debugf("1:y=%i, abs(y) =%i, leftP=%i,rightP=%i",y, abs(y), leftPwm, rightPwm);
 			//check direction to move(needed for knowing which side to move - wheels)
 			if (y > 0) {
@@ -200,15 +198,15 @@ void CarCommand::drive(int leftDir, int leftPwm, int rightDir, int rightPwm) {
 	digitalWrite(leftMotorDir, leftDir);
 	digitalWrite(rightMotorDir, rightDir);
 	if (leftPwm == 0 ){
-		pwmMotors.noAnalogWrite(leftMotorPWM);
+		pwmMotors->analogWrite(leftMotorPWM, 0);
 	} else {
-		pwmMotors.analogWrite(leftMotorPWM, leftPwm);
+		pwmMotors->analogWrite(leftMotorPWM, leftPwm);
 	}
 
 	if (rightPwm == 0 ){
-		pwmMotors.noAnalogWrite(rightMotorPWM);
+		pwmMotors->analogWrite(rightMotorPWM, 0);
 	} else {
-		pwmMotors.analogWrite(rightMotorPWM, rightPwm);
+		pwmMotors->analogWrite(rightMotorPWM, rightPwm);
 	}
 }
 
