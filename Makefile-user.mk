@@ -46,7 +46,7 @@ SPI_SIZE        ?= 4M
 #RBOOT_ROM_1     ?= rom1
 #RBOOT_LD_1      ?= rom1.ld
 ## size of the spiffs to create
-SPIFF_SIZE      ?= 65536
+SPIFF_SIZE      ?= 65535
 ## option to completely disable spiffs
 #DISABLE_SPIFFS  = 1
 ## flash offsets for spiffs, set if using two rom mode or not on a 4mb flash
@@ -62,3 +62,5 @@ OTA_SERVER ?= ""
 ifneq ($(OTA_SERVER), "")
 	CFLAGS += -DOTA_SERVER=\"$(OTA_SERVER)\"
 endif
+ESPTOOL      ?= $(ESP_HOME)/utils/esptool.py
+SPIFF_FILES = files

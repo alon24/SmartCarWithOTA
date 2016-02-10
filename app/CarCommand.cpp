@@ -15,6 +15,7 @@ CarCommand::CarCommand(int leftMotorPWM, int rightMotorPWM, int leftMotorDir, in
 	uint8_t pins[2] = { (uint8_t)leftMotorPWM, (uint8_t)rightMotorPWM }; // List of pins that you want to connect to pwm
 
 	pwmMotors = new HardwarePWM(pins, 2);
+//	pwmMotors->
 	debugf("CarCommand Instantiating");
 }
 
@@ -104,12 +105,15 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 		}
 
 		if (commandToken[1].startsWith("xyz")) {
-
 			int x = commandToken[2].toInt();
 			int y = commandToken[3].toInt();
-			int z = commandToken[4].toInt();
+			debugf("xy =%i,%i", x,y);
+			int z = 100;
+			if (numToken == 5) {
+				int z = commandToken[4].toInt();
+			}
 
-//			debugf("1:y=%i, abs(y) =%i, leftP=%i,rightP=%i",y, abs(y), leftPwm, rightPwm);
+			debugf("1:y=%i, abs(y) =%i, leftP=%i,rightP=%i",y, abs(y), leftPwm, rightPwm);
 			//check direction to move(needed for knowing which side to move - wheels)
 			if (y > 0) {
 				dir = FW;
