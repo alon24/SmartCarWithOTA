@@ -107,13 +107,12 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 		if (commandToken[1].startsWith("xyz")) {
 			int x = commandToken[2].toInt();
 			int y = commandToken[3].toInt();
-			debugf("xy =%i,%i", x,y);
 			int z = 100;
 			if (numToken == 5) {
 				int z = commandToken[4].toInt();
 			}
 
-			debugf("1:y=%i, abs(y) =%i, leftP=%i,rightP=%i",y, abs(y), leftPwm, rightPwm);
+			debugf("ilan1:y=%i, abs(y) =%i, leftP=%i,rightP=%i",y, abs(y), leftPwm, rightPwm);
 			//check direction to move(needed for knowing which side to move - wheels)
 			if (y > 0) {
 				dir = FW;
@@ -143,26 +142,32 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 
 			if (dir != STOP) {
 				if (x>0) {
+					debugf("!@Stop=1");
 					tdir = TR;
 				} else if (x<0) {
+					debugf("!@Stop=2");
 					tdir = TL;
 				} else {
+					debugf("!@Stop=3");
 					tdir = STRAIGHT;
 				}
 
 				//set motors to run (power)
 				leftPwm = map(abs(y), 0, 100,  0, 1023);
 				rightPwm = map(abs(y), 0, 100,  0, 1023);
-
+				debugf("ilan13: leftP=%i,rightP=%i",leftPwm, rightPwm);
 				//check if we want to move right
 				if (dir == FW) {
 					if (tdir == TL) {
+						debugf("FW1");
 						rightDir = HIGH;
 						leftPwm = 0;
 					} else if (tdir == TR) {
+						debugf("FW2");
 						leftDir = HIGH;
 						rightPwm = 0;
 					}else if (tdir == STRAIGHT) {
+						debugf("FW3");
 						leftDir = HIGH;
 						rightDir = HIGH;
 					}
@@ -170,12 +175,15 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 				else if (dir == BK)
 				{
 					if (tdir == TL) {
+						debugf("bk1");
 						rightDir = LOW;
 						leftPwm = 0;
 					} else if (tdir == TR) {
+						debugf("bk2");
 						leftDir = LOW;
 						rightPwm = 0;
 					}else if (tdir == STRAIGHT) {
+						debugf("bk3");
 						leftDir = LOW;
 						rightDir = LOW;
 					}
@@ -186,7 +194,7 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 				rightPwm = 0;
 			}
 
-//			debugf("inside command:leftD=%i,leftP=%i,rightD=%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
+			debugf("inside command:leftD=%i,leftP=%i,rightD=%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
 		}
 
 		drive(leftDir, leftPwm, rightDir, rightPwm);
