@@ -81,6 +81,8 @@ private:
 	bool countDown = false;
 	int minPower = 1;
 
+	int freq = 30;
+
 	void processCarCommands(String commandLine, CommandOutput* commandOutput);
 	void handleMotorTimer();
 	void drive(int leftDir, int leftPwm, int rightDir, int rightPwm);

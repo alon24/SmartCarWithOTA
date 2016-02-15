@@ -15,7 +15,7 @@ CarCommand::CarCommand(int leftMotorPWM, int rightMotorPWM, int leftMotorDir, in
 	uint8_t pins[8] = { (uint8_t)leftMotorPWM, (uint8_t)rightMotorPWM }; // List of pins that you want to connect to pwm
 
 	pwmMotors = new HardwarePWM(pins, 2);
-	pwmMotors->setPeriod(30*1000);
+	pwmMotors->setPeriod(1000000 / freq);
 //	pwmMotors->
 	debugf("CarCommand Instantiating");
 }
@@ -211,15 +211,13 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 
 /*
  * pin - pin number
- * Freq in MHZ so 250 == 250 MHZ
+ * Freq in Hz so 250 == 250Hz
  * pwr - how much power 0-1023
  */
-void CarCommand::handleCheckFreq(int pin, int freq, int pwr) {
-//	int time = 1000 /freq * 1000;
-	int time = freq * 1000;
+void CarCommand::handleCheckFreq(int pin, int frq, int pwr) {
+	int time = 1000000 / frq;
 	pwmMotors->setPeriod(time);
 	pwmMotors->analogWrite(pin, pwr);
-	pwmMotors->restart();
 	debugf("handleCheckFreq pin=%i, freq=%i, time=%i, pwr=%i", pin, freq, time, pwr);
 }
 
@@ -243,7 +241,10 @@ void CarCommand::handleJoystickXY(int x, int y) {
 
 	//in an abs world - decrease half the mortor power from the turning direction
 	if ( absX > 0 ) {
-		powerRight = powerRight - (absX / 100 * absY);
+		powerRight = powerLeft - absY * absX / 100;
+		if (powerRight < 0) {
+			powerRight = 0;
+		}
 	}
 
 	//now Translate to actual directions... 4 quadrents are available
