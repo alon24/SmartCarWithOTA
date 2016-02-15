@@ -12,9 +12,10 @@ CarCommand::CarCommand(int leftMotorPWM, int rightMotorPWM, int leftMotorDir, in
 	this->leftMotorDir = leftMotorDir;
 	this->rightMotorDir = rightMotorDir;
 
-	uint8_t pins[2] = { (uint8_t)leftMotorPWM, (uint8_t)rightMotorPWM }; // List of pins that you want to connect to pwm
+	uint8_t pins[8] = { (uint8_t)leftMotorPWM, (uint8_t)rightMotorPWM }; // List of pins that you want to connect to pwm
 
 	pwmMotors = new HardwarePWM(pins, 2);
+	pwmMotors->setPeriod(30*1000);
 //	pwmMotors->
 	debugf("CarCommand Instantiating");
 }
@@ -34,7 +35,7 @@ void CarCommand::initCommand()
 
 	//Check and act upon car commands
 	motorTimer.setCallback(carMotorDelegate(&CarCommand::handleMotorTimer, this));
-	motorTimer.setIntervalMs(100);
+	motorTimer.setIntervalMs(150);
 
 //	motorTimer.setCallback(carMotorDelegate(&CarCommand::testPWM, this));
 //	motorTimer.setIntervalMs(1000);
@@ -64,20 +65,20 @@ void CarCommand::testPWM()
 		i = 100;
 		countUp = false;
 		countDown = true;
-		pwmMotors->analogWrite(leftMotorPWM, 1023);
+		pwmMotors->setDuty(leftMotorPWM, 1023);
 	}else {
 		i = 1;
 		countUp = true;
 		countDown = false;
-		pwmMotors->analogWrite(leftMotorPWM,0);
-//		pwmMotors.analogWrite(leftMotorPWM, 1);
+		pwmMotors->setDuty(leftMotorPWM,0);
+//		pwmMotors.setDuty(leftMotorPWM, 1);
 	}
 
 	int pp = map(i, 0, 100, 0, 1023);
 	Serial.println(pp);
-//	pwmMotors.analogWrite(leftMotorPWM, pp);
+//	pwmMotors.setDuty(leftMotorPWM, pp);
 //	digitalWrite(leftMotorDir, LOW);
-//	pwmMotors.analogWrite(rightMotorPWM, pp);
+//	pwmMotors.setDuty(rightMotorPWM, pp);
 //	digitalWrite(rightMotorDir, HIGH);
 }
 
@@ -104,13 +105,20 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 			motorTimer.stop();
 		}
 
-		if (commandToken[1].startsWith("xyz")) {
+		if (commandToken[1] == "xyJoystick") {
 			int x = commandToken[2].toInt();
 			int y = commandToken[3].toInt();
-			int z = 100;
-			if (numToken == 5) {
-				int z = commandToken[4].toInt();
-			}
+			handleJoystickXY(x, y);
+		}
+		else if (commandToken[1] == "freq") {
+			int pin = commandToken[2].toInt();
+			int freq = commandToken[3].toInt();
+			int pwr = commandToken[4].toInt();
+			handleCheckFreq(pin, freq, pwr);
+		}
+		else if (commandToken[1].startsWith("xy")) {
+			int x = commandToken[2].toInt();
+			int y = commandToken[3].toInt();
 
 			debugf("ilan1:y=%i, abs(y) =%i, leftP=%i,rightP=%i",y, abs(y), leftPwm, rightPwm);
 			//check direction to move(needed for knowing which side to move - wheels)
@@ -195,31 +203,124 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 			}
 
 			debugf("inside command:leftD=%i,leftP=%i,rightD=%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
+			drive(leftDir, leftPwm, rightDir, rightPwm);
+			motorTimer.startOnce();
 		}
-
-		drive(leftDir, leftPwm, rightDir, rightPwm);
-		motorTimer.startOnce();
 	}
 }
 
+/*
+ * pin - pin number
+ * Freq in MHZ so 250 == 250 MHZ
+ * pwr - how much power 0-1023
+ */
+void CarCommand::handleCheckFreq(int pin, int freq, int pwr) {
+//	int time = 1000 /freq * 1000;
+	int time = freq * 1000;
+	pwmMotors->setPeriod(time);
+	pwmMotors->analogWrite(pin, pwr);
+	pwmMotors->restart();
+	debugf("handleCheckFreq pin=%i, freq=%i, time=%i, pwr=%i", pin, freq, time, pwr);
+}
+
+void CarCommand::handleRegularXy() {
+
+}
+
+void CarCommand::handleJoystickXY(int x, int y) {
+	if (y == 0){
+		drive(0,0,0,0);
+		return;
+	}
+
+	int absY = abs(y);
+	int powerLeft = absY;
+	int powerRight = powerLeft;
+	int absX = abs(x);
+
+	int dirLeft = 1;
+	int dirRight =1;
+
+	//in an abs world - decrease half the mortor power from the turning direction
+	if ( absX > 0 ) {
+		powerRight = powerRight - (absX / 100 * absY);
+	}
+
+	//now Translate to actual directions... 4 quadrents are available
+	if (y > 0) {
+		dir = FW;
+	} else if (y == 0) {
+		dir = STOP;
+	}
+	else {
+		dir = BK;
+	}
+
+	if (dir != STOP) {
+		if (x>0) {
+			debugf("!@Stop=1");
+			tdir = TR;
+		} else if (x<0) {
+			debugf("!@Stop=2");
+			tdir = TL;
+		} else {
+			debugf("!@Stop=3");
+			tdir = STRAIGHT;
+		}
+
+		//FF + TR -> Already covered!!!
+		if (dir == FW && tdir == TL) {
+			//switch MAIN engine (so turn left
+			powerLeft += powerRight;
+			powerRight = powerLeft - powerRight;
+			powerLeft = powerLeft - powerRight;
+		} else if (dir == BK) {
+			dirLeft = 0;
+			dirRight = 0;
+
+			if (tdir == TL) {
+				powerLeft += powerRight;
+				powerRight = powerLeft - powerRight;
+				powerLeft = powerLeft - powerRight;
+			}
+		}
+	}
+
+	int leftPwm = map(abs(powerLeft), 0, 100,  minPower, 1023);
+	int rightPwm = map(abs(powerRight), 0, 100,  minPower, 1023);
+	debugf("************* handleJoystickXY: x=%i, y=%i, dirLeft=%i, leftPwm=%i, dirRight=%i, rightPwm=%i", x, y, dirLeft, leftPwm, dirRight, rightPwm);
+	drive(dirLeft, leftPwm, dirRight, rightPwm);
+}
+
+int CarCommand::roundMovement(int power) {
+	//scale is 1 -> 10
+	//output is 0->1023
+	int tmpPower = 1023 / 10 * power;
+
+	return tmpPower;
+}
+
 void CarCommand::drive(int leftDir, int leftPwm, int rightDir, int rightPwm) {
-	debugf("drive command:leftD=%i,leftP=%i,rightD-%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
+	debugf("drive command:leftD=%i,leftP=%i,rightD=%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
 	spdTargetLeft = leftPwm;
 	spdTargetRight = rightPwm;
 
 	digitalWrite(leftMotorDir, leftDir);
 	digitalWrite(rightMotorDir, rightDir);
-	if (leftPwm == 0 ){
-		pwmMotors->analogWrite(leftMotorPWM, 0);
+
+	if (leftPwm < minPower ){
+		pwmMotors->setDuty(leftMotorPWM, 0, false);
 	} else {
-		pwmMotors->analogWrite(leftMotorPWM, leftPwm);
+		pwmMotors->setDuty(leftMotorPWM, leftPwm, false);
 	}
 
-	if (rightPwm == 0 ){
-		pwmMotors->analogWrite(rightMotorPWM, 0);
+	if (rightPwm < minPower ){
+		pwmMotors->setDuty(rightMotorPWM, 0, false);
 	} else {
-		pwmMotors->analogWrite(rightMotorPWM, rightPwm);
+		pwmMotors->setDuty(rightMotorPWM, rightPwm, false);
 	}
+
+	pwmMotors->restart();
 }
 
 //Stop the car

@@ -343,7 +343,7 @@ void wsMessageReceived(WebSocket& socket, const String& message)
 {
 	Serial.printf("WebSocket message received:\r\n%s\r\n", message.c_str());
 	String response = "Echo: " + message;
-	socket.sendString(response);
+//	socket.sendString(response);
 }
 
 void wsBinaryReceived(WebSocket& socket, uint8_t* data, size_t size)

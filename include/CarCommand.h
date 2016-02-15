@@ -53,8 +53,8 @@ private:
 
 //	bool stopped = true;
 
-	int leftMotorPWM;
-	int rightMotorPWM;
+	uint8 leftMotorPWM;
+	uint8 rightMotorPWM;
 	int leftMotorDir;
 	int rightMotorDir;
 	int duration = 200;
@@ -79,12 +79,17 @@ private:
 	int i = 0;
 	bool countUp = true;
 	bool countDown = false;
+	int minPower = 1;
 
 	void processCarCommands(String commandLine, CommandOutput* commandOutput);
 	void handleMotorTimer();
 	void drive(int leftDir, int leftPwm, int rightDir, int rightPwm);
 
 	void testPWM();
+	void handleRegularXy();
+	void handleJoystickXY(int x, int y);
+	int roundMovement(int power);
+	void handleCheckFreq(int pin, int freq, int pwr);
 };
 
 
