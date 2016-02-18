@@ -6,11 +6,13 @@ library code for esp8266, for showing multiple info screens with data on them, t
 #### Based on sming: https://github.com/SmingHub/Sming
 
 #### Videos
-Part I:
-[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/=SP16IC3cjSQ/0.jpg)](https://www.youtube.com/watch?v=SP16IC3cjSQ)
 
-Part II:
-[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/=6NuD5W3aYoI/0.jpg)](https://www.youtube.com/watch?v=6NuD5W3aYoI)
+Part I:</br>
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/SP16IC3cjSQ/0.jpg)](https://www.youtube.com/watch?v=SP16IC3cjSQ)
+</br>
+Part II:</br>
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/6NuD5W3aYoI/0.jpg)](https://www.youtube.com/watch?v=6NuD5W3aYoI)
+</br>
 
 ### License and credits
 
