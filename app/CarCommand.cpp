@@ -15,8 +15,7 @@ CarCommand::CarCommand(int leftMotorPWM, int rightMotorPWM, int leftMotorDir, in
 	uint8_t pins[8] = { (uint8_t)leftMotorPWM, (uint8_t)rightMotorPWM }; // List of pins that you want to connect to pwm
 
 	pwmMotors = new HardwarePWM(pins, 2);
-	pwmMotors->setPeriod(1000000 / freq);
-//	pwmMotors->
+	setFreq(carParams.freq);
 	debugf("CarCommand Instantiating");
 }
 
@@ -42,6 +41,19 @@ void CarCommand::initCommand()
 //	motorTimer.start(true);
 }
 
+void CarCommand::tuneCarParamaters(int freq, bool useSteering) {
+	setFreq(freq);
+	carParams.useSteeringMotor = useSteering;
+}
+
+int CarCommand::getCurrentFreq() {
+	return carParams.freq;
+}
+
+void CarCommand::setFreq(int freq){
+	carParams.freq = freq;
+	pwmMotors->setPeriod(1000000 / carParams.freq);
+}
 
 void CarCommand::testPWM()
 {
@@ -115,6 +127,11 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 			int freq = commandToken[3].toInt();
 			int pwr = commandToken[4].toInt();
 			handleCheckFreq(pin, freq, pwr);
+		}
+		else if (commandToken[1] == "tune") {
+			int freq = commandToken[2].toInt();
+			int useSteering = commandToken[3].toInt();
+			tuneCarParamaters(freq, useSteering);
 		}
 		else if (commandToken[1].startsWith("xy")) {
 			int x = commandToken[2].toInt();
@@ -218,7 +235,7 @@ void CarCommand::handleCheckFreq(int pin, int frq, int pwr) {
 	int time = 1000000 / frq;
 	pwmMotors->setPeriod(time);
 	pwmMotors->analogWrite(pin, pwr);
-	debugf("handleCheckFreq pin=%i, freq=%i, time=%i, pwr=%i", pin, freq, time, pwr);
+	debugf("handleCheckFreq pin=%i, freq=%i, time=%i, pwr=%i", pin, frq, time, pwr);
 }
 
 void CarCommand::handleRegularXy() {
@@ -303,8 +320,6 @@ int CarCommand::roundMovement(int power) {
 
 void CarCommand::drive(int leftDir, int leftPwm, int rightDir, int rightPwm) {
 	debugf("drive command:leftD=%i,leftP=%i,rightD=%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
-	spdTargetLeft = leftPwm;
-	spdTargetRight = rightPwm;
 
 	digitalWrite(leftMotorDir, leftDir);
 	digitalWrite(rightMotorDir, rightDir);

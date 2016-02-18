@@ -27,6 +27,11 @@
 
 typedef Delegate<void()> carMotorDelegate;
 
+struct CarParamaters {
+	int freq = 30;
+	bool useSteeringMotor = false;
+};
+
 class CarCommand
 {
 public:
@@ -48,40 +53,23 @@ private:
 	int tdir = STRAIGHT;
 	int tcount = 0;
 
-//	int x = 0; //X movement percent
-//	int y = 0; // Y movement percent
-
-//	bool stopped = true;
-
 	uint8 leftMotorPWM;
 	uint8 rightMotorPWM;
 	int leftMotorDir;
 	int rightMotorDir;
-	int duration = 200;
-
-	//--target Speed
-	int spdTargetLeft=1023;
-
-	//--current speed
-	int spdCurrentLeft=0;
-
-	//--target Speed
-	int spdTargetRight = 1023;
-	//--current speed
-	int spdCurrentRight = 0;
 
 	long lastActionTime;
 	Timer motorTimer;
-
 	HardwarePWM *pwmMotors;
-//	DriverPWM pwmMotors;
 
 	int i = 0;
 	bool countUp = true;
 	bool countDown = false;
 	int minPower = 1;
 
-	int freq = 30;
+	CarParamaters carParams;
+
+//	int pwmWorkingFreq = 30;
 
 	void processCarCommands(String commandLine, CommandOutput* commandOutput);
 	void handleMotorTimer();
@@ -92,6 +80,9 @@ private:
 	void handleJoystickXY(int x, int y);
 	int roundMovement(int power);
 	void handleCheckFreq(int pin, int freq, int pwr);
+	int getCurrentFreq();
+	void setFreq(int freq);
+	void tuneCarParamaters(int freq, bool useSteering);
 };
 
 
