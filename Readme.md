@@ -1,7 +1,7 @@
 # ESP8266 SmartCarWithOTA - With Menu
 ------
 
-library code for esp8266, for showing multiple info screens with data on them, that refreshes automatically for you onscreen (currently only ssd1306 is supported), and also a menu system navigated with one button.
+Wifi car based on sming and implemented using websockets
 
 #### Based on sming: https://github.com/SmingHub/Sming
 
