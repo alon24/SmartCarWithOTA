@@ -35,10 +35,11 @@ struct CarParamaters {
 class CarCommand
 {
 public:
+	CarParamaters carParams;
+
 	CarCommand(int leftMotorPWM, int rightMotorPWM, int leftMotorDir, int rightMotorDir);
 	virtual ~CarCommand();
 	void initCommand();
-
 private:
 
 	int lastY = 0;
@@ -67,8 +68,6 @@ private:
 	bool countDown = false;
 	int minPower = 1;
 
-	CarParamaters carParams;
-
 //	int pwmWorkingFreq = 30;
 
 	void processCarCommands(String commandLine, CommandOutput* commandOutput);
@@ -76,9 +75,10 @@ private:
 	void drive(int leftDir, int leftPwm, int rightDir, int rightPwm);
 
 	void testPWM();
-	void handleRegularXy();
+	void handleFixedXy(int x, int y);
 	void handleJoystickXY(int x, int y);
-	int roundMovement(int power);
+	void handleUseSteeringMotor(int x, int y);
+	void handleNotUseSteeringMotor(int x, int y);
 	void handleCheckFreq(int pin, int freq, int pwr);
 	int getCurrentFreq();
 	void setFreq(int freq);

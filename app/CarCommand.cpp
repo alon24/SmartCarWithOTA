@@ -98,10 +98,6 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 {
 	Vector<String> commandToken;
 	int numToken = splitString(commandLine, ' ' , commandToken);
-	int rightPwm =0;
-	int leftPwm = 0;
-	int rightDir = 0;
-	int leftDir = 0;
 
 	debugf("Got commandLine = %s", commandLine.c_str());
 	if (numToken == 1)
@@ -136,92 +132,7 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 		else if (commandToken[1].startsWith("xy")) {
 			int x = commandToken[2].toInt();
 			int y = commandToken[3].toInt();
-
-			debugf("ilan1:y=%i, abs(y) =%i, leftP=%i,rightP=%i",y, abs(y), leftPwm, rightPwm);
-			//check direction to move(needed for knowing which side to move - wheels)
-			if (y > 0) {
-				dir = FW;
-			} else if (y == 0) {
-				dir = STOP;
-			}
-			else {
-				dir = BK;
-			}
-
-			// if currently we just do right or left, keep the last heading (lastY)
-			if (x != 0 && y == 0) {
-				if (lastY != 0) {
-					if (lastY > 0) {
-						dir = FW;
-						y = lastY;
-					}
-					else {
-						dir = BK;
-						y = lastY;
-					}
-				}
-			}
-
-			lastY = y;
-			lastX = x;
-
-			if (dir != STOP) {
-				if (x>0) {
-					debugf("!@Stop=1");
-					tdir = TR;
-				} else if (x<0) {
-					debugf("!@Stop=2");
-					tdir = TL;
-				} else {
-					debugf("!@Stop=3");
-					tdir = STRAIGHT;
-				}
-
-				//set motors to run (power)
-				leftPwm = map(abs(y), 0, 100,  0, 1023);
-				rightPwm = map(abs(y), 0, 100,  0, 1023);
-				debugf("ilan13: leftP=%i,rightP=%i",leftPwm, rightPwm);
-				//check if we want to move right
-				if (dir == FW) {
-					if (tdir == TL) {
-						debugf("FW1");
-						rightDir = HIGH;
-						leftPwm = 0;
-					} else if (tdir == TR) {
-						debugf("FW2");
-						leftDir = HIGH;
-						rightPwm = 0;
-					}else if (tdir == STRAIGHT) {
-						debugf("FW3");
-						leftDir = HIGH;
-						rightDir = HIGH;
-					}
-				}
-				else if (dir == BK)
-				{
-					if (tdir == TL) {
-						debugf("bk1");
-						rightDir = LOW;
-						leftPwm = 0;
-					} else if (tdir == TR) {
-						debugf("bk2");
-						leftDir = LOW;
-						rightPwm = 0;
-					}else if (tdir == STRAIGHT) {
-						debugf("bk3");
-						leftDir = LOW;
-						rightDir = LOW;
-					}
-				}
-			}
-			else {
-				leftPwm = 0;
-				rightPwm = 0;
-			}
-
-			debugf("inside command:leftD=%i,leftP=%i,rightD=%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
-			drive(leftDir, leftPwm, rightDir, rightPwm);
-			motorTimer.startOnce();
+			handleFixedXy(x, y);
 		}
 	}
 }
@@ -238,11 +149,120 @@ void CarCommand::handleCheckFreq(int pin, int frq, int pwr) {
 	debugf("handleCheckFreq pin=%i, freq=%i, time=%i, pwr=%i", pin, frq, time, pwr);
 }
 
-void CarCommand::handleRegularXy() {
+void CarCommand::handleFixedXy(int x, int y) {
+	int rightPwm =0;
+	int leftPwm = 0;
+	int rightDir = 0;
+	int leftDir = 0;
+//	debugf("ilan1:y=%i, abs(y) =%i, leftP=%i,rightP=%i",y, abs(y), leftPwm, rightPwm);
+	//check direction to move(needed for knowing which side to move - wheels)
+	if (y > 0) {
+		dir = FW;
+	} else if (y == 0) {
+		dir = STOP;
+	}
+	else {
+		dir = BK;
+	}
 
+	// if currently we just do right or left, keep the last heading (lastY)
+	if (x != 0 && y == 0) {
+		if (lastY != 0) {
+			if (lastY > 0) {
+				dir = FW;
+				y = lastY;
+			}
+			else {
+				dir = BK;
+				y = lastY;
+			}
+		}
+	}
+
+	lastY = y;
+	lastX = x;
+
+	if (dir != STOP) {
+		if (x>0) {
+			debugf("!@Stop=1");
+			tdir = TR;
+		} else if (x<0) {
+			debugf("!@Stop=2");
+			tdir = TL;
+		} else {
+			debugf("!@Stop=3");
+			tdir = STRAIGHT;
+		}
+
+		//set motors to run (power)
+		leftPwm = map(abs(y), 0, 100,  0, 1023);
+		rightPwm = map(abs(y), 0, 100,  0, 1023);
+		debugf("ilan13: leftP=%i,rightP=%i",leftPwm, rightPwm);
+		//check if we want to move right
+		if (dir == FW) {
+			if (tdir == TL) {
+				debugf("FW1");
+				rightDir = HIGH;
+				leftPwm = 0;
+			} else if (tdir == TR) {
+				debugf("FW2");
+				leftDir = HIGH;
+				rightPwm = 0;
+			}else if (tdir == STRAIGHT) {
+				debugf("FW3");
+				leftDir = HIGH;
+				rightDir = HIGH;
+			}
+		}
+		else if (dir == BK)
+		{
+			if (tdir == TL) {
+				debugf("bk1");
+				rightDir = LOW;
+				leftPwm = 0;
+			} else if (tdir == TR) {
+				debugf("bk2");
+				leftDir = LOW;
+				rightPwm = 0;
+			}else if (tdir == STRAIGHT) {
+				debugf("bk3");
+				leftDir = LOW;
+				rightDir = LOW;
+			}
+		}
+	}
+	else {
+		leftPwm = 0;
+		rightPwm = 0;
+	}
+
+//	debugf("inside command:leftD=%i,leftP=%i,rightD=%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
+	drive(leftDir, leftPwm, rightDir, rightPwm);
+	motorTimer.startOnce();
 }
 
-void CarCommand::handleJoystickXY(int x, int y) {
+void CarCommand::handleJoystickXY(int x, int y)  {
+	if (y == 0){
+		drive(0,0,0,0);
+		return;
+	}
+
+	int absY = abs(y);
+	int powerLeft = absY;
+	int powerRight = powerLeft;
+	int absX = abs(x);
+
+	int dirLeft = 1;
+	int dirRight =1;
+
+	if (carParams.useSteeringMotor) {
+		return handleUseSteeringMotor(x, y);
+	} else {
+		return handleNotUseSteeringMotor(x, y);
+	}
+}
+
+void CarCommand::handleUseSteeringMotor(int x, int y) {
 	if (y == 0){
 		drive(0,0,0,0);
 		return;
@@ -310,12 +330,72 @@ void CarCommand::handleJoystickXY(int x, int y) {
 	drive(dirLeft, leftPwm, dirRight, rightPwm);
 }
 
-int CarCommand::roundMovement(int power) {
-	//scale is 1 -> 10
-	//output is 0->1023
-	int tmpPower = 1023 / 10 * power;
+void CarCommand::handleNotUseSteeringMotor(int x, int y) {
+	if (y == 0){
+		drive(0,0,0,0);
+		return;
+	}
 
-	return tmpPower;
+	int absY = abs(y);
+	int powerLeft = absY;
+	int powerRight = powerLeft;
+	int absX = abs(x);
+
+	int dirLeft = 1;
+	int dirRight =1;
+
+	//in an abs world - decrease half the mortor power from the turning direction
+	if ( absX > 0 ) {
+		powerRight = powerLeft - absY * absX / 100;
+		if (powerRight < 0) {
+			powerRight = 0;
+		}
+	}
+
+	//now Translate to actual directions... 4 quadrents are available
+	if (y > 0) {
+		dir = FW;
+	} else if (y == 0) {
+		dir = STOP;
+	}
+	else {
+		dir = BK;
+	}
+
+	if (dir != STOP) {
+		if (x>0) {
+			debugf("!@Stop=1");
+			tdir = TR;
+		} else if (x<0) {
+			debugf("!@Stop=2");
+			tdir = TL;
+		} else {
+			debugf("!@Stop=3");
+			tdir = STRAIGHT;
+		}
+
+		//FF + TR -> Already covered!!!
+		if (dir == FW && tdir == TL) {
+			//switch MAIN engine (so turn left
+			powerLeft += powerRight;
+			powerRight = powerLeft - powerRight;
+			powerLeft = powerLeft - powerRight;
+		} else if (dir == BK) {
+			dirLeft = 0;
+			dirRight = 0;
+
+			if (tdir == TL) {
+				powerLeft += powerRight;
+				powerRight = powerLeft - powerRight;
+				powerLeft = powerLeft - powerRight;
+			}
+		}
+	}
+
+	int leftPwm = map(abs(powerLeft), 0, 100,  minPower, 1023);
+	int rightPwm = map(abs(powerRight), 0, 100,  minPower, 1023);
+	debugf("************* handleJoystickXY: x=%i, y=%i, dirLeft=%i, leftPwm=%i, dirRight=%i, rightPwm=%i", x, y, dirLeft, leftPwm, dirRight, rightPwm);
+	drive(dirLeft, leftPwm, dirRight, rightPwm);
 }
 
 void CarCommand::drive(int leftDir, int leftPwm, int rightDir, int rightPwm) {
