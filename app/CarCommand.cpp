@@ -39,6 +39,8 @@ void CarCommand::initCommand()
 //	motorTimer.setCallback(carMotorDelegate(&CarCommand::testPWM, this));
 //	motorTimer.setIntervalMs(1000);
 //	motorTimer.start(true);
+
+	ultrasonic.begin(ULTRASONIC_TRIG_PIN, ULTRASONIC_ECHO_PIN);
 }
 
 void CarCommand::tuneCarParamaters(int freq, bool useSteering) {
@@ -409,3 +411,12 @@ void CarCommand::drive(int leftDir, int leftPwm, int rightDir, int rightPwm) {
 void CarCommand::handleMotorTimer() {
 	drive(0,0,0,0);
 };
+
+void CarCommand::measure()
+{
+	// get distance
+	uint16_t dist = ultrasonic.rangeCM();
+
+	// print the distance
+	Serial.println(dist);
+}
