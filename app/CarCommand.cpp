@@ -33,7 +33,7 @@ void CarCommand::initCommand()
 	digitalWrite(rightMotorDir, HIGH);
 
 	//Check and act upon car commands
-	motorTimer.setCallback(carMotorDelegate(&CarCommand::handleMotorTimer, this));
+	motorTimer.setCallback(TimerDelegate(&CarCommand::handleMotorTimer, this));
 	motorTimer.setIntervalMs(150);
 
 //	motorTimer.setCallback(carMotorDelegate(&CarCommand::testPWM, this));
@@ -135,6 +135,12 @@ void CarCommand::processCarCommands(String commandLine, CommandOutput* commandOu
 			int x = commandToken[2].toInt();
 			int y = commandToken[3].toInt();
 			handleFixedXy(x, y);
+		}
+		else if (commandToken[1] == "measure") {
+			int dist = measure();
+			if (publisDelegate) {
+				publisDelegate("distance:" + String(dist));
+			}
 		}
 	}
 }
@@ -412,11 +418,17 @@ void CarCommand::handleMotorTimer() {
 	drive(0,0,0,0);
 };
 
-void CarCommand::measure()
+uint16_t CarCommand::measure()
 {
 	// get distance
 	uint16_t dist = ultrasonic.rangeCM();
 
 	// print the distance
 	Serial.println(dist);
+	return dist;
+}
+
+void CarCommand::setOnPublishDelegate(CarPublishInfoDelegate handler)
+{
+	publisDelegate  = handler;
 }

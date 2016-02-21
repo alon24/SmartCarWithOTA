@@ -37,11 +37,11 @@
 // How many NeoPixels are attached to the Esp8266?
 #define NUMPIXELS      6
 
-typedef Delegate<void()> carMotorDelegate;
+typedef Delegate<void(String cmd)> CarPublishInfoDelegate;
 
 struct CarParamaters {
 	int freq = 30;
-	bool useSteeringMotor = false;
+	bool useSteeringMotor = true;
 };
 
 class CarCommand
@@ -52,10 +52,14 @@ public:
 	CarCommand(int leftMotorPWM, int rightMotorPWM, int leftMotorDir, int rightMotorDir);
 	virtual ~CarCommand();
 	void initCommand();
+	//Delegated call when event needs to be published back
+	void setOnPublishDelegate(CarPublishInfoDelegate handler);
+
 private:
 	Ultrasonic ultrasonic = Ultrasonic();
 	Adafruit_NeoPixel ledStrip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
+	CarPublishInfoDelegate publisDelegate = null;
 	int lastY = 0;
 	int lastX = 0;
 	int currentX = 0;
@@ -95,7 +99,7 @@ private:
 	int getCurrentFreq();
 	void setFreq(int freq);
 	void tuneCarParamaters(int freq, bool useSteering);
-	void measure();
+	uint16_t measure();
 };
 
 

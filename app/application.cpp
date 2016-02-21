@@ -366,10 +366,15 @@ void processApplicationCommands(String commandLine, CommandOutput* commandOutput
 	commandOutput->printf("This command is handle by the application\r\n");
 }
 
+void handleCarCallbacks(String cmd) {
+	debugf("cmd from car is: %s", cmd.c_str());
+}
+
 void initCarCommands()
 {
 	carCommand.initCommand();
 	commandHandler.registerCommand(CommandDelegate("example","Example Command from Class","Application",processApplicationCommands));
+	carCommand.setOnPublishDelegate(handleCarCallbacks);
 }
 
 void StartServers()
