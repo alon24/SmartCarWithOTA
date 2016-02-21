@@ -8,6 +8,7 @@
 
 #include "SmingCore.h"
 #include <libraries/Ultrasonic/Ultrasonic.h>
+#include <libraries/Adafruit_NeoPixel/Adafruit_NeoPixel.h>
 
 //https://www.gitbook.com/book/smartarduino/user-mannual-for-esp-12e-motor-shield/details
 
@@ -30,6 +31,12 @@
 #define ULTRASONIC_TRIG_PIN 4
 #define ULTRASONIC_ECHO_PIN 5
 
+// Which pin on the Esp8266 is connected to the NeoPixels?
+#define PIN            13
+
+// How many NeoPixels are attached to the Esp8266?
+#define NUMPIXELS      6
+
 typedef Delegate<void()> carMotorDelegate;
 
 struct CarParamaters {
@@ -47,6 +54,7 @@ public:
 	void initCommand();
 private:
 	Ultrasonic ultrasonic = Ultrasonic();
+	Adafruit_NeoPixel ledStrip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
 	int lastY = 0;
 	int lastX = 0;
@@ -73,8 +81,6 @@ private:
 	bool countUp = true;
 	bool countDown = false;
 	int minPower = 1;
-
-//	int pwmWorkingFreq = 30;
 
 	void processCarCommands(String commandLine, CommandOutput* commandOutput);
 	void handleMotorTimer();
