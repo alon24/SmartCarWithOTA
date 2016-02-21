@@ -269,22 +269,13 @@ void CarCommand::handleUseSteeringMotor(int x, int y) {
 	}
 
 	int absY = abs(y);
-	int powerLeft = absY;
-	int powerRight = powerLeft;
 	int absX = abs(x);
+	int powerY = absY;
+	int powerTurn = absX;
 
-	int dirLeft = 1;
-	int dirRight =1;
+	int dirY = 1;
+	int dirTurn =1;
 
-	//in an abs world - decrease half the mortor power from the turning direction
-	if ( absX > 0 ) {
-		powerRight = powerLeft - absY * absX / 100;
-		if (powerRight < 0) {
-			powerRight = 0;
-		}
-	}
-
-	//now Translate to actual directions... 4 quadrents are available
 	if (y > 0) {
 		dir = FW;
 	} else if (y == 0) {
@@ -308,26 +299,21 @@ void CarCommand::handleUseSteeringMotor(int x, int y) {
 
 		//FF + TR -> Already covered!!!
 		if (dir == FW && tdir == TL) {
-			//switch MAIN engine (so turn left
-			powerLeft += powerRight;
-			powerRight = powerLeft - powerRight;
-			powerLeft = powerLeft - powerRight;
+			dirTurn = 0;
 		} else if (dir == BK) {
-			dirLeft = 0;
-			dirRight = 0;
+			dirY = 0;
+			dirTurn = 0;
 
 			if (tdir == TL) {
-				powerLeft += powerRight;
-				powerRight = powerLeft - powerRight;
-				powerLeft = powerLeft - powerRight;
+				powerTurn = 0;
 			}
 		}
 	}
 
-	int leftPwm = map(abs(powerLeft), 0, 100,  minPower, 1023);
-	int rightPwm = map(abs(powerRight), 0, 100,  minPower, 1023);
-	debugf("************* handleJoystickXY: x=%i, y=%i, dirLeft=%i, leftPwm=%i, dirRight=%i, rightPwm=%i", x, y, dirLeft, leftPwm, dirRight, rightPwm);
-	drive(dirLeft, leftPwm, dirRight, rightPwm);
+	int yPwm = map(abs(powerY), 0, 100,  minPower, 1023);
+	int turnPwm = map(abs(powerTurn), 0, 100,  minPower, 1023);
+	debugf("************* handleJoystickXY: x=%i, y=%i, dirY=%i, yPwm=%i, dirTurn=%i, turnPwm=%i", x, y, dirY, yPwm, dirTurn, turnPwm);
+	drive(dirY, yPwm, dirTurn, turnPwm);
 }
 
 void CarCommand::handleNotUseSteeringMotor(int x, int y) {
