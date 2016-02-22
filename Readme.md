@@ -1,4 +1,4 @@
-# ESP8266 SmartCarWithOTA - With Menu
+# ESP8266 SmartCarWithOTA
 ------
 
 Wifi car based on sming and implemented using websockets
