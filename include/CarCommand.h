@@ -7,8 +7,8 @@
 #define SMINGCORE_EXAMPLE_COMMAND_H_
 
 #include "SmingCore.h"
-//#include <libraries/Ultrasonic/Ultrasonic.h>
-//#include <libraries/Adafruit_NeoPixel/Adafruit_NeoPixel.h>
+#include <libraries/Ultrasonic/Ultrasonic.h>
+#include <libraries/Adafruit_NeoPixel/Adafruit_NeoPixel.h>
 
 //https://www.gitbook.com/book/smartarduino/user-mannual-for-esp-12e-motor-shield/details
 
@@ -28,11 +28,11 @@
 #define MOTOR_BK 0
 
 #define headLights 12
-#define ULTRASONIC_TRIG_PIN 4
-#define ULTRASONIC_ECHO_PIN 5
+#define ULTRASONIC_TRIG_PIN 12
+#define ULTRASONIC_ECHO_PIN 14
 
 // Which pin on the Esp8266 is connected to the NeoPixels?
-#define PIN            13
+#define LED_STRIP_PIN            13
 
 // How many NeoPixels are attached to the Esp8266?
 #define NUMPIXELS      6
@@ -40,8 +40,8 @@
 typedef Delegate<void(String cmd)> CarPublishInfoDelegate;
 
 struct CarParamaters {
-	int freq = 50;//30;
-	int xConvertionRation = 10;
+	int freq = 78;//30;
+	int xConvertionRation = 30;
 	bool useSteeringMotor = true;
 };
 
@@ -57,8 +57,8 @@ public:
 	void setOnPublishDelegate(CarPublishInfoDelegate handler);
 
 private:
-//	Ultrasonic ultrasonic = Ultrasonic();
-//	Adafruit_NeoPixel ledStrip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+	Ultrasonic ultrasonic = Ultrasonic();
+	Adafruit_NeoPixel ledStrip = Adafruit_NeoPixel(NUMPIXELS, LED_STRIP_PIN, NEO_GRB + NEO_KHZ800);
 
 	CarPublishInfoDelegate publisDelegate = null;
 	int lastY = 0;

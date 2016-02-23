@@ -40,7 +40,7 @@ void CarCommand::initCommand()
 //	motorTimer.setIntervalMs(1000);
 //	motorTimer.start(true);
 
-//	ultrasonic.begin(ULTRASONIC_TRIG_PIN, ULTRASONIC_ECHO_PIN);
+	ultrasonic.begin(ULTRASONIC_TRIG_PIN, ULTRASONIC_ECHO_PIN);
 }
 
 void CarCommand::tuneCarParamaters(int freq, bool useSteering) {
@@ -316,7 +316,7 @@ void CarCommand::handleUseSteeringMotor(int x, int y) {
 	}
 
 	int yPwm = map(abs(powerY), 0, 100,  minPower, 1023);
-	int turnPwm = map(abs(powerTurn/20), 0, (100/20),  minPower, 1023);
+	int turnPwm = map(abs(powerTurn/carParams.xConvertionRation), 0, (100/carParams.xConvertionRation),  minPower, 1023);
 //	int turnPwm = (x== 0 ? 0 : 1023;
 	debugf("************* handleJoystickXY: x=%i, y=%i, dirY=%i, yPwm=%i, dirTurn=%i, turnPwm=%i", x, y, dirY, yPwm, dirTurn, turnPwm);
 	drive(dirY, yPwm, dirTurn, turnPwm);
