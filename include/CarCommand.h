@@ -7,8 +7,8 @@
 #define SMINGCORE_EXAMPLE_COMMAND_H_
 
 #include "SmingCore.h"
-#include <libraries/Ultrasonic/Ultrasonic.h>
-#include <libraries/Adafruit_NeoPixel/Adafruit_NeoPixel.h>
+//#include <libraries/Ultrasonic/Ultrasonic.h>
+//#include <libraries/Adafruit_NeoPixel/Adafruit_NeoPixel.h>
 
 //https://www.gitbook.com/book/smartarduino/user-mannual-for-esp-12e-motor-shield/details
 
@@ -40,7 +40,8 @@
 typedef Delegate<void(String cmd)> CarPublishInfoDelegate;
 
 struct CarParamaters {
-	int freq = 30;
+	int freq = 50;//30;
+	int xConvertionRation = 10;
 	bool useSteeringMotor = true;
 };
 
@@ -56,8 +57,8 @@ public:
 	void setOnPublishDelegate(CarPublishInfoDelegate handler);
 
 private:
-	Ultrasonic ultrasonic = Ultrasonic();
-	Adafruit_NeoPixel ledStrip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+//	Ultrasonic ultrasonic = Ultrasonic();
+//	Adafruit_NeoPixel ledStrip = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
 	CarPublishInfoDelegate publisDelegate = null;
 	int lastY = 0;

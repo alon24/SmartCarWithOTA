@@ -40,7 +40,7 @@ void CarCommand::initCommand()
 //	motorTimer.setIntervalMs(1000);
 //	motorTimer.start(true);
 
-	ultrasonic.begin(ULTRASONIC_TRIG_PIN, ULTRASONIC_ECHO_PIN);
+//	ultrasonic.begin(ULTRASONIC_TRIG_PIN, ULTRASONIC_ECHO_PIN);
 }
 
 void CarCommand::tuneCarParamaters(int freq, bool useSteering) {
@@ -295,13 +295,10 @@ void CarCommand::handleUseSteeringMotor(int x, int y) {
 
 	if (dir != STOP) {
 		if (x>0) {
-			debugf("!@Stop=1");
 			tdir = TR;
 		} else if (x<0) {
-			debugf("!@Stop=2");
 			tdir = TL;
 		} else {
-			debugf("!@Stop=3");
 			tdir = STRAIGHT;
 		}
 
@@ -310,16 +307,17 @@ void CarCommand::handleUseSteeringMotor(int x, int y) {
 			dirTurn = 0;
 		} else if (dir == BK) {
 			dirY = 0;
-			dirTurn = 0;
+			dirTurn = tdir == TR ? 1 :0;
 
-			if (tdir == TL) {
-				powerTurn = 0;
-			}
+//			if (tdir == TL) {
+//				powerTurn = 0;
+//			}
 		}
 	}
 
 	int yPwm = map(abs(powerY), 0, 100,  minPower, 1023);
-	int turnPwm = map(abs(powerTurn), 0, 100,  minPower, 1023);
+	int turnPwm = map(abs(powerTurn/20), 0, (100/20),  minPower, 1023);
+//	int turnPwm = (x== 0 ? 0 : 1023;
 	debugf("************* handleJoystickXY: x=%i, y=%i, dirY=%i, yPwm=%i, dirTurn=%i, turnPwm=%i", x, y, dirY, yPwm, dirTurn, turnPwm);
 	drive(dirY, yPwm, dirTurn, turnPwm);
 }
@@ -421,11 +419,11 @@ void CarCommand::handleMotorTimer() {
 uint16_t CarCommand::measure()
 {
 	// get distance
-	uint16_t dist = ultrasonic.rangeCM();
-
-	// print the distance
-	Serial.println(dist);
-	return dist;
+//	uint16_t dist = ultrasonic.rangeCM();
+//
+//	// print the distance
+//	Serial.println(dist);
+//	return dist;
 }
 
 void CarCommand::setOnPublishDelegate(CarPublishInfoDelegate handler)
