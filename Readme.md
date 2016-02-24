@@ -3,7 +3,11 @@
 
 Wifi car based on sming and implemented using websockets
 
-#### Based on sming: https://github.com/SmingHub/Sming
+#### Based on sming-rtos: https://github.com/SmingHub/SmingRTOS
+
+Hardware:
+Nodemcu dev kit
+Nodemcu motorshield http://www.aliexpress.com/item/NodeMCU-lua-wifi-Motor-Shield-Board-L293D-for-ESP-12E-from-ESP8266-esp-12E-rc-toy/32469900979.html
 
 #### Videos
 
