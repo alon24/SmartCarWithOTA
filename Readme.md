@@ -9,6 +9,8 @@ Hardware: </br>
 Nodemcu dev kit </br>
 Nodemcu motorshield http://www.aliexpress.com/item/NodeMCU-lua-wifi-Motor-Shield-Board-L293D-for-ESP-12E-from-ESP8266-esp-12E-rc-toy/32469900979.html, https://www.gitbook.com/book/smartarduino/user-mannual-for-esp-12e-motor-shield/details
 
+http://www.banggood.com/ESP8266-WiFi-Motor-Drive-Expansion-Board-For-NodeMCU-ESP-12E-p-991603.html
+
 D1 - pwmA - GPIO5</br>
 D3 - DA  - GPIO0</br>
 D2 - pwmB - GPIO4</br>
