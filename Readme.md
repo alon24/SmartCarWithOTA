@@ -7,7 +7,12 @@ Wifi car based on sming and implemented using websockets
 
 Hardware: </br>
 Nodemcu dev kit </br>
-Nodemcu motorshield http://www.aliexpress.com/item/NodeMCU-lua-wifi-Motor-Shield-Board-L293D-for-ESP-12E-from-ESP8266-esp-12E-rc-toy/32469900979.html 
+Nodemcu motorshield http://www.aliexpress.com/item/NodeMCU-lua-wifi-Motor-Shield-Board-L293D-for-ESP-12E-from-ESP8266-esp-12E-rc-toy/32469900979.html, https://www.gitbook.com/book/smartarduino/user-mannual-for-esp-12e-motor-shield/details
+
+D1 - pwmA - GPIO5</br>
+D3 - DA  - GPIO0</br>
+D2 - pwmB - GPIO4</br>
+D4 - DB - GPIO2</br>
 
 For power I am using 2*18650 batt in series (so around 8.2v)
 
