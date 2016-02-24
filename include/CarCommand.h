@@ -89,7 +89,9 @@ private:
 
 	void processCarCommands(String commandLine, CommandOutput* commandOutput);
 	void handleMotorTimer();
+
 	void drive(int leftDir, int leftPwm, int rightDir, int rightPwm);
+	void drive(int leftDir, int leftPwm, int rightDir, int rightPwm, boolean useSteeringMotor);
 
 	void testPWM();
 	void handleFixedXy(int x, int y);

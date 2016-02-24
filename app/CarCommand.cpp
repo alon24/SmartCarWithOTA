@@ -316,9 +316,9 @@ void CarCommand::handleUseSteeringMotor(int x, int y) {
 	}
 
 	int yPwm = map(abs(powerY), 0, 100,  minPower, 1023);
-	int turnPwm = map(abs(powerTurn/carParams.xConvertionRation), 0, (100/carParams.xConvertionRation),  minPower, 1023);
+	int turnPwm = map(abs(powerTurn), 0, 100,  minPower, 1023);
 //	int turnPwm = (x== 0 ? 0 : 1023;
-	debugf("************* handleJoystickXY: x=%i, y=%i, dirY=%i, yPwm=%i, dirTurn=%i, turnPwm=%i", x, y, dirY, yPwm, dirTurn, turnPwm);
+	debugf("************* handleUseSteeringMotor: x=%i, y=%i, dirY=%i, yPwm=%i, dirTurn=%i, turnPwm=%i", x, y, dirY, yPwm, dirTurn, turnPwm);
 	drive(dirY, yPwm, dirTurn, turnPwm);
 }
 
@@ -386,11 +386,15 @@ void CarCommand::handleNotUseSteeringMotor(int x, int y) {
 
 	int leftPwm = map(abs(powerLeft), 0, 100,  minPower, 1023);
 	int rightPwm = map(abs(powerRight), 0, 100,  minPower, 1023);
-	debugf("************* handleJoystickXY: x=%i, y=%i, dirLeft=%i, leftPwm=%i, dirRight=%i, rightPwm=%i", x, y, dirLeft, leftPwm, dirRight, rightPwm);
+	debugf("************* handleNotUseSteeringMotor: x=%i, y=%i, dirLeft=%i, leftPwm=%i, dirRight=%i, rightPwm=%i", x, y, dirLeft, leftPwm, dirRight, rightPwm);
 	drive(dirLeft, leftPwm, dirRight, rightPwm);
 }
 
 void CarCommand::drive(int leftDir, int leftPwm, int rightDir, int rightPwm) {
+	drive(leftDir, leftPwm, rightDir, rightPwm, false);
+}
+
+void CarCommand::drive(int leftDir, int leftPwm, int rightDir, int rightPwm, boolean useSteeringMotor) {
 	debugf("drive command:leftD=%i,leftP=%i,rightD=%i,rightP=%i", leftDir, leftPwm, rightDir, rightPwm);
 
 	digitalWrite(leftMotorDir, leftDir);
@@ -404,6 +408,9 @@ void CarCommand::drive(int leftDir, int leftPwm, int rightDir, int rightPwm) {
 
 	if (rightPwm < minPower ){
 		pwmMotors->setDuty(rightMotorPWM, 0, false);
+	} else if(rightPwm > 1000) {
+		digitalWrite(rightMotorPWM, HIGH);
+		debugf("rightPwm = %i, so setting HIGH", rightPwm);
 	} else {
 		pwmMotors->setDuty(rightMotorPWM, rightPwm, false);
 	}
